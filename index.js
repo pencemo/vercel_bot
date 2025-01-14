@@ -35,10 +35,10 @@ bot.use((ctx, next) => {
     return next();
 });
 
-bot.use((ctx, next) => {
-    console.log(`Received message from ${ctx.from.first_name}: ${ctx.message.text}`);
-    return next();
-})
+// bot.use((ctx, next) => {
+//     console.log(`Received message from ${ctx.from.first_name}: ${ctx.message.text}`);
+//     return next();
+// })
 
 bot.command("start", (ctx) => ctx.reply("Welcome to the bot!"));
 
