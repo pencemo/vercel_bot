@@ -2,27 +2,28 @@ import { Bot } from "grammy";
 import express from "express"
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import { json } from '@vercel/node';
 dotenv.config();
 
 const token = process.env.BOT_TOKEN
-const port = process.env.PORT || 3000;
+// const port = process.env.PORT || 3000;
 
-const app = express();
-app.use(bodyParser.json());
+// const app = express();
+// app.use(bodyParser.json());
 
 // Create a bot object
 const bot = new Bot(token);  
 
-app.post('/webhook', async (req, res) => {
-    const update = req.body;
-    try {
-      await bot.handleUpdate(update);
-      res.send('OK');
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
-    }
-  });
+// app.post('/webhook', async (req, res) => {
+//     const update = req.body;
+//     try {
+//       await bot.handleUpdate(update);
+//       res.send('OK');
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).send('Internal Server Error');
+//     }
+//   });
 
 bot.use((ctx, next) => {
     const admin = process.env.ADMIN_ID;
@@ -42,6 +43,17 @@ bot.use((ctx, next) => {
 
 bot.command("start", (ctx) => ctx.reply("Welcome to the bot!"));
 
+
+// Setup a webhook
+export default async (req, res) => {
+    if (req.method === 'POST') {
+      const update = req.body;
+      await bot.handleUpdate(update);
+      res.status(200).send('OK');
+    } else {
+      res.status(405).send('Method Not Allowed');
+    }
+  };
 // const start = async () => {
 //     const url = `${process.env.WEBHOOK_URL}/webhook`;
 //   if (process.env.NODE_ENV !== "development") {
@@ -57,6 +69,6 @@ bot.command("start", (ctx) => ctx.reply("Welcome to the bot!"));
 // start();
 bot.start();
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-})
+// app.listen(port, () => {
+//   console.log(`Server is running on port ${port}`);
+// })
