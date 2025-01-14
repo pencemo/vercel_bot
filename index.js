@@ -54,7 +54,7 @@ bot.command("start", (ctx) => ctx.reply("Welcome to the bot!"));
 //   }
 // }
 
-start();
+// start();
 bot.start();
 
 app.listen(port, () => {
