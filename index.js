@@ -2,7 +2,7 @@ import { Bot } from "grammy";
 import express from "express"
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import { json } from '@vercel/node';
+// import { json } from '@vercel/node';
 dotenv.config();
 
 const token = process.env.BOT_TOKEN
