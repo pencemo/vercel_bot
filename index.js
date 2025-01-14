@@ -58,7 +58,7 @@ bot.command("start", (ctx) => ctx.reply("Welcome to the bot!"));
 
 
 start();
-bot.start();
+// bot.start();
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
