@@ -47,8 +47,8 @@ const start = async () => {
   if (process.env.NODE_ENV !== "development") {
     try {
         // First, delete any existing webhook
-        await bot.api.deleteWebhook();
-        console.log("Previous webhook deleted");
+        // await bot.api.deleteWebhook();
+        // console.log("Previous webhook deleted");
   
         // Now set the new webhook
         await bot.api.setWebhook(url);
@@ -61,4 +61,4 @@ const start = async () => {
 };
 
 start();
-bot.start();
+// bot.start();
