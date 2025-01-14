@@ -12,7 +12,6 @@ app.use(bodyParser.json());
 
 // Create a bot object
 const bot = new Bot(token);
-bot.init();
 
 app.post("/webhook", async (req, res) => {
   const update = req.body;
@@ -49,7 +48,7 @@ const start = async () => {
         // First, delete any existing webhook
         // await bot.api.deleteWebhook();
         // console.log("Previous webhook deleted");
-  
+        await bot.init();
         // Now set the new webhook
         await bot.api.setWebhook(url);
         console.log("New webhook set successfully");
