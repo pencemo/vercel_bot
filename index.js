@@ -46,11 +46,17 @@ const start = async () => {
   const url = `${process.env.WEBHOOK_URL}/webhook`;
   if (process.env.NODE_ENV !== "development") {
     try {
-      await bot.api.setWebhook(url);
-      console.log("Bot is running");
-    } catch (error) {
-      console.error("Error setting webhook:", error);
-    }
+        // First, delete any existing webhook
+        await bot.api.deleteWebhook();
+        console.log("Previous webhook deleted");
+  
+        // Now set the new webhook
+        await bot.api.setWebhook(url);
+        console.log("New webhook set successfully");
+  
+      } catch (error) {
+        console.error("Error setting webhook:", error);
+      }
   }
 };
 
