@@ -12,7 +12,8 @@ const token = process.env.BOT_TOKEN
 // app.use(bodyParser.json());
 
 // Create a bot object
-const bot = new Bot(token);  
+const bot = new Bot(token);
+// bot.init()  
 
 // app.post('/webhook', async (req, res) => {
 //     const update = req.body;
@@ -48,6 +49,7 @@ bot.command("start", (ctx) => ctx.reply("Welcome to the bot!"));
 export default async (req, res) => {
     if (req.method === 'POST') {
       const update = req.body;
+      await bot.init()
       await bot.handleUpdate(update);
       res.status(200).send('OK');
     } else {
