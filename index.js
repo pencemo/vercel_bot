@@ -42,17 +42,17 @@ bot.use((ctx, next) => {
 
 bot.command("start", (ctx) => ctx.reply("Welcome to the bot!"));
 
-const start = async () => {
-    const url = `${process.env.WEBHOOK_URL}/webhook`;
-  if (process.env.NODE_ENV !== "development") {
-    try {
-        await bot.api.setWebhook(url);
-        console.log("Bot is running");
-      } catch (error) {
-        console.error("Error setting webhook:", error);
-      }
-  }
-}
+// const start = async () => {
+//     const url = `${process.env.WEBHOOK_URL}/webhook`;
+//   if (process.env.NODE_ENV !== "development") {
+//     try {
+//         await bot.api.setWebhook(url);
+//         console.log("Bot is running");
+//       } catch (error) {
+//         console.error("Error setting webhook:", error);
+//       }
+//   }
+// }
 
 start();
 bot.start();
