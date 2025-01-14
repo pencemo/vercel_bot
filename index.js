@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 // Create a bot object
 const bot = new Bot(token);
-// bot.init()  
+bot.init()  
 
 app.post('/webhook', async (req, res) => {
     const update = req.body;
@@ -36,28 +36,12 @@ bot.use((ctx, next) => {
     return next();
 });
 
-// bot.use((ctx, next) => {
-//     console.log(`Received message from ${ctx.from.first_name}: ${ctx.message.text}`);
-//     return next();
-// })
 
 bot.command("start", (ctx) => ctx.reply("Welcome to the bot!"));
 
 
-// Setup a webhook
-// export default async (req, res) => {
-//     if (req.method === 'POST') {
-//       const update = req.body;
-//       await bot.init()
-//       await bot.handleUpdate(update);
-//       res.status(200).send('OK');
-//     } else {
-//       res.status(405).send('Method Not Allowed');
-//     }
-//   };
-
 const start = async () => {
-    const url = `${process.env.WEBHOOK_URL}/webhook`;
+const url = `${process.env.WEBHOOK_URL}/webhook`;
   if (process.env.NODE_ENV !== "development") {
     try {
         await bot.api.setWebhook(url);
