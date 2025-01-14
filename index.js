@@ -24,9 +24,24 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+
+const start = async () => {
+    await bot.init();
+  const url = `${process.env.WEBHOOK_URL}/webhook`;
+  if (process.env.NODE_ENV !== "development") {
+    try {
+        // First, delete any existing webhook
+        // await bot.api.deleteWebhook();
+        // console.log("Previous webhook deleted");
+        // Now set the new webhook
+        await bot.api.setWebhook(url);
+        console.log("New webhook set successfully");
+  
+      } catch (error) {
+        console.error("Error setting webhook:", error);
+      }
+  }
+};
 
 bot.use((ctx, next) => {
   const admin = process.env.ADMIN_ID;
@@ -41,23 +56,11 @@ bot.use((ctx, next) => {
 
 bot.command("start", (ctx) => ctx.reply("Welcome to the bot!"));
 
-const start = async () => {
-  const url = `${process.env.WEBHOOK_URL}/webhook`;
-  if (process.env.NODE_ENV !== "development") {
-    try {
-        // First, delete any existing webhook
-        // await bot.api.deleteWebhook();
-        // console.log("Previous webhook deleted");
-        await bot.init();
-        // Now set the new webhook
-        await bot.api.setWebhook(url);
-        console.log("New webhook set successfully");
-  
-      } catch (error) {
-        console.error("Error setting webhook:", error);
-      }
-  }
-};
 
 start();
-// bot.start();
+bot.start();
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+  
