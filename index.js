@@ -13,7 +13,11 @@ app.use(bodyParser.json());
 // Create a bot object
 const bot = new Bot(token);
 
+// const update = async () => {
+// }
+// update()
 app.post("/webhook", async (req, res) => {
+  await bot.init()
   const update = req.body;
   try {
     await bot.handleUpdate(update);
@@ -24,9 +28,8 @@ app.post("/webhook", async (req, res) => {
   }
 });
 
-
 const start = async () => {
-    await bot.init();
+  // await bot.init()
   const url = `${process.env.WEBHOOK_URL}/webhook`;
   if (process.env.NODE_ENV !== "development") {
     try {
@@ -42,6 +45,7 @@ const start = async () => {
       }
   }
 };
+
 
 bot.use((ctx, next) => {
   const admin = process.env.ADMIN_ID;
