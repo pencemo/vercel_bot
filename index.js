@@ -39,9 +39,10 @@ const start = async () => {
     } catch (error) {
       console.error("Error setting webhook:", error);
     }
-  } else {
-    bot.start();
-  }
+  } 
+  // else {
+  //   bot.start();
+  // }
 };
 
 bot.use((ctx, next) => {
