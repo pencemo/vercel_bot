@@ -18,32 +18,31 @@ app.use(bodyParser.json());
 // Create a bot object
 const bot = new Bot(token);
 
-app.post("/webhook", async (req, res) => {
+app.post("/api/webhook", async (req, res) => {
   await bot.init();
   const update = req.body;
   try {
     await bot.handleUpdate(update);
-    res.send("OK");
+    res.status(200).send("OK");
   } catch (error) {
-    console.error(error);
+    console.error("Error handling webhook update:", error);
     res.status(500).send("Internal Server Error");
   }
 });
 
 const start = async () => {
-  const url = `${process.env.WEBHOOK_URL}/webhook`;
-  if (process.env.NODE_ENV !== "development") {
-    try {
-      // await bot.api.deleteWebhook();
+  const url = `${process.env.WEBHOOK_URL}/api/webhook`;
+  try {
+    if (process.env.NODE_ENV !== "development") {
       await bot.api.setWebhook(url);
-      console.log("New webhook set successfully");
-    } catch (error) {
-      console.error("Error setting webhook:", error);
+      console.log("New webhook set successfully at:", url);
+    } else {
+      console.log("Starting bot in development mode...");
+      bot.start();
     }
-  } 
-  else {
-    bot.start(); 
-  } 
+  } catch (error) {
+    console.error("Error setting webhook or starting bot:", error);
+  }
 };
 
 bot.use((ctx, next) => {
@@ -67,10 +66,11 @@ bot.command("msg", (ctx) => {
   const str = ctx.message.text;
   const data = extractData(str);
   ctx.reply(
-    `Filters: ${data.name.join(", ")}\n` ,
+    `Filters: ${data.name.join(", ")}\n`,
     {
       reply_markup: {
-        inline_keyboard: data.buttons,}
+        inline_keyboard: data.buttons,
+      },
     }
   );
 }); 
@@ -78,13 +78,11 @@ bot.command("msg", (ctx) => {
 bot.on("message:text", findFilter);
 
 bot.catch((err, ctx) => {
-  console.log( err);
+  console.error("Bot error:", err);
   ctx.reply("An error occurred");
 });
 
 start();
-
-app.listen(port, () => {
-  connection();
-  console.log(`Server is running on port ${port}`);
-});
+connection()
+// Vercel serverless function export
+export default app;
