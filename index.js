@@ -36,7 +36,7 @@ const start = async () => {
     try {
       // await bot.api.deleteWebhook();
       await bot.api.setWebhook(url);
-      // console.log("New webhook set successfully");
+      console.log("New webhook set successfully");
     } catch (error) {
       console.error("Error setting webhook:", error);
     }
@@ -61,7 +61,7 @@ bot.use((ctx, next) => {
 });
 
 bot.command("add", addFilters);  
-
+bot.command("start", (ctx) => ctx.reply("Welcome to the bot"));
 
 bot.command("msg", (ctx) => {
   const str = ctx.message.text;
@@ -82,9 +82,9 @@ bot.catch((err, ctx) => {
   ctx.reply("An error occurred");
 });
 
-start();
 
 app.listen(port, () => {
   connection();
+  start();
   console.log(`Server is running on port ${port}`);
 });
