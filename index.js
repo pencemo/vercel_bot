@@ -82,9 +82,9 @@ bot.catch((err, ctx) => {
   ctx.reply("An error occurred");
 });
 
+start();
 
 app.listen(port, () => {
   connection();
-  start();
   console.log(`Server is running on port ${port}`);
 });
