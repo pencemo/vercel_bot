@@ -20,7 +20,7 @@ const escapeMarkdownSpecialChars = (text) => {
 };
 
 const addMarkdownFormatting = (text, entities) => {
-    if(!entities) return
+    if(!entities) return text
     // Sort entities by offset in descending order to avoid issues with overlapping ranges
     entities.sort((a, b) => b.offset - a.offset);
   

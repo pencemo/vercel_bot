@@ -34,15 +34,16 @@ const start = async () => {
   const url = `${process.env.WEBHOOK_URL}/webhook`;
   if (process.env.NODE_ENV !== "development") {
     try {
+      // await bot.api.deleteWebhook();
       await bot.api.setWebhook(url);
       // console.log("New webhook set successfully");
     } catch (error) {
       console.error("Error setting webhook:", error);
     }
   } 
-  // else {
-  //   bot.start();
-  // }
+  else {
+    bot.start(); 
+  } 
 };
 
 bot.use((ctx, next) => {
@@ -65,7 +66,6 @@ bot.command("add", addFilters);
 bot.command("msg", (ctx) => {
   const str = ctx.message.text;
   const data = extractData(str);
-  console.log(data.buttons);
   ctx.reply(
     `Filters: ${data.name.join(", ")}\n` ,
     {
