@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 // Create a bot object
 const bot = new Bot(token);
 
-app.post("/api/webhook", async (req, res) => {
+app.post("/webhook", async (req, res) => {
   await bot.init();
   const update = req.body;
   try {
@@ -31,11 +31,11 @@ app.post("/api/webhook", async (req, res) => {
 });
 
 const start = async () => {
-  const url = `${process.env.WEBHOOK_URL}/api/webhook`;
+  const url = `${process.env.WEBHOOK_URL}/webhook`;
   try {
     if (process.env.NODE_ENV !== "development") {
-      await bot.api.setWebhook(url);
       app.listen(port, () => {console.log(port);})
+      await bot.api.setWebhook(url);
       console.log("New webhook set successfully at:", url);
     } else {
       console.log("Starting bot in development mode...");
@@ -86,4 +86,4 @@ bot.catch((err, ctx) => {
 start();
 connection()
 // Vercel serverless function export
-export default app;
+// export default app;
