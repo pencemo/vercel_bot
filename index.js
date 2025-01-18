@@ -35,6 +35,7 @@ const start = async () => {
   try {
     if (process.env.NODE_ENV !== "development") {
       await bot.api.setWebhook(url);
+      app.listen(port, () => {console.log(port);})
       console.log("New webhook set successfully at:", url);
     } else {
       console.log("Starting bot in development mode...");
