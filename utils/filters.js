@@ -5,6 +5,7 @@ const addFilters = async (ctx) => {
   if (ctx.chat.type != "private") {
     return ctx.reply("This command only works in private chat");
   }
+  try {
   const replayText = ctx.message.reply_to_message;
   if (!replayText) {
     return ctx.reply("Reply to a message to add filter");
@@ -15,9 +16,11 @@ const addFilters = async (ctx) => {
   if(!replayText.text) {
     return ctx.reply("Message is empty");
   }
-  try {
     const { text } = ctx.message;
     const data = extractData(text);
+    if(data.name.length == 0) {
+      return ctx.reply("Send a valid filter name");
+    }
     const isFilter = await Filter.findOne({ name: { $all: data.name } });
     if (isFilter) {
       return ctx.reply("Filter already exists");
@@ -30,7 +33,7 @@ const addFilters = async (ctx) => {
       ),
     });
     filter.save();
-    ctx.reply(`Added ${data.name.join(", ")}`);
+    ctx.reply(`Added filters for - ${data.name.join(", ")}`);
   } catch (error) {
     console.log(error);
     ctx.reply("Error adding filter");
@@ -65,8 +68,6 @@ const findFilter = async (ctx) => {
         reply_to_message_id: repId,
         parse_mode: "MarkdownV2",
       });
-    } else {
-      console.log("No filter found for text:", text);
     }
   } catch (error) {
     console.error("Error in findFilter:", error); // Handle any errors

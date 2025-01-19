@@ -3,9 +3,6 @@ import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { connection } from "./db/connection.js";
-import { Filter } from "./db/models.js";
-import { addMarkdownFormatting, extractData } from "./utils/helpers.js";
-import { markdownv2 as format } from "telegram-format";
 import { addFilters, findFilter } from "./utils/filters.js";
 dotenv.config();
 
@@ -36,7 +33,7 @@ const start = async () => {
     if (process.env.NODE_ENV !== "development") {
       app.listen(port, () => {console.log(port);})
       await bot.api.setWebhook(url);
-      console.log("New webhook set successfully at:", url);
+      console.log("New webhook :", url);
     } else {
       console.log("Starting bot in development mode...");
       bot.start();
@@ -63,19 +60,6 @@ bot.use((ctx, next) => {
 bot.command("add", addFilters);  
 bot.command("start", (ctx) => ctx.reply("Welcome to the bot"));
 
-bot.command("msg", (ctx) => {
-  const str = ctx.message.text;
-  const data = extractData(str);
-  ctx.reply(
-    `Filters: ${data.name.join(", ")}\n`,
-    {
-      reply_markup: {
-        inline_keyboard: data.buttons,
-      },
-    }
-  );
-}); 
-
 bot.on("message:text", findFilter);
 
 bot.catch((err, ctx) => {
@@ -85,5 +69,4 @@ bot.catch((err, ctx) => {
 
 start();
 connection()
-// Vercel serverless function export
-// export default app;
+

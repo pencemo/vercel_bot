@@ -50,12 +50,12 @@ const addMarkdownFormatting = (text, entities) => {
         case 'text_link':
           formattedText = `${formattedText.slice(0, entity.offset)}[${formattedText.slice(entity.offset, entity.offset + entity.length)}](${entity.url})${formattedText.slice(entity.offset + entity.length)}`;
           break;
-        case 'mention':
-            formattedText = `${formattedText.slice(0, entity.offset)}[${formattedText.slice(entity.offset, entity.offset + entity.length)}](tg://user?id=${entity.user.id})${formattedText.slice(entity.offset + entity.length)}`;
-            break;
-        case 'cashtag':
-            formattedText = `${formattedText.slice(0, entity.offset)}$${formattedText.slice(entity.offset, entity.offset + entity.length)}${formattedText.slice(entity.offset + entity.length)}`;
-            break;
+        // case 'mention':
+        //     formattedText = `${formattedText.slice(0, entity.offset)}[${formattedText.slice(entity.offset, entity.offset + entity.length)}](tg://user?id=${entity.user.id})${formattedText.slice(entity.offset + entity.length)}`;
+        //     break;
+        // case 'cashtag':
+        //     formattedText = `${formattedText.slice(0, entity.offset)}$${formattedText.slice(entity.offset, entity.offset + entity.length)}${formattedText.slice(entity.offset + entity.length)}`;
+        //     break;
         case 'quote':
             formattedText = `${formattedText.slice(0, entity.offset)}>${formattedText.slice(entity.offset, entity.offset + entity.length)}>${formattedText.slice(entity.offset + entity.length)}`;
             break;
