@@ -77,5 +77,5 @@ bot.catch(async (err) => {
 start();
 connection()
 
-export default webhookCallback(bot, "vercel");
+// export default webhookCallback(bot, "vercel");
 
