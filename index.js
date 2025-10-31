@@ -1,4 +1,4 @@
-import { Api, Bot } from "grammy";
+import { Api, Bot, webhookCallback } from "grammy";
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
@@ -76,4 +76,6 @@ bot.catch(async (err) => {
  
 start();
 connection()
+
+export default webhookCallback(bot, "vercel");
 
