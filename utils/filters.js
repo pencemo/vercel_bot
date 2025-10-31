@@ -60,7 +60,7 @@ const addFilters = async (ctx) => {
 
 
 function escapeMarkdownV2(text) { 
-  return text.replace(/([_*\[\]()~`>#+\-=|{}.!\\])/g, "\\$1");
+  return text.replace(/([[\]()~>#+=|{}.!\\-])/g, '\\$1'); 
 }
 
 

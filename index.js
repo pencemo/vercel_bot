@@ -60,8 +60,15 @@ bot.command("batch", batchCommand);
 bot.command("done", doneCommand);
 bot.command("id", (ctx) => ctx.reply("Your ID : "+ctx.from.id));
 bot.command("ping", (ctx) => ctx.reply("pong"));
+// bot.command("file", (ctx) => ctx.replyWithDocument("BQACAgUAAxkBAAIIGmkErVggOPcUYBvjUvWejgt9ZLwkAAJXGQACBdsoVNWVjztMV9AnNgQ"));
 
 bot.on("message:text", findFilter);
+// bot.on("message:file", (ctx)=>{
+//   console.log(ctx.message);
+//   if(ctx){
+//     ctx.reply(ctx.message.document.file_id);
+//   }
+// })
 bot.on(["message:document", "message:photo", "message:video"], fileSave);
 
 bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerFilterPagination);

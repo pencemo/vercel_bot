@@ -26,10 +26,19 @@ export const refresh = async (ctx) => {
         await ctx.editMessageText(`📦 Sending ${batch.slugs.length} files...`);
         for (const slug of batch.slugs) {
           const file = await File.findOne({ slug });
-          if (file) {
+          if (!file) {
+            await ctx.reply(`❌ File not found for slug: ${slug}`);
+            continue;
+          }
+        
+          try {
             await ctx.api.copyMessage(ctx.chat.id, file.chatId, file.messageId, {
               protect_content: true,
             });
+          } catch (err) {
+            console.error(`Error copying message for slug ${slug}:`, err.description);
+            await ctx.reply(`⚠️ Couldn't send file (${slug}) — maybe deleted or private.`);
+            continue;
           }
         }
         await ctx.editMessageText("✅ All files sent successfully!");
@@ -40,9 +49,15 @@ export const refresh = async (ctx) => {
       if (!file) return ctx.reply("⚠️ Invalid file link.");
   
       await ctx.editMessageText("✅ You’re verified! Sending your file...");
+      
+    try {
       await ctx.api.copyMessage(ctx.chat.id, file.chatId, file.messageId, {
         protect_content: true,
       });
+    } catch (err) {
+      console.error(`Error :`, err.description);
+      await ctx.reply(`⚠️ Couldn't send file — maybe deleted or private.`);
+    }
     } catch (err) {
       console.error("Refresh error:", err);
       await ctx.answerCallbackQuery({

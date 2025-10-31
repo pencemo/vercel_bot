@@ -56,10 +56,19 @@ export const startMsg = async (ctx) => {
       await ctx.reply(`📦 Sending ${batch.slugs.length} files...`);
       for (const slug of batch.slugs) {
         const file = await File.findOne({ slug });
-        if (file) {
+        if (!file) {
+          await ctx.reply(`❌ File not found for slug: ${slug}`);
+          continue;
+        }
+      
+        try {
           await ctx.api.copyMessage(ctx.chat.id, file.chatId, file.messageId, {
             protect_content: true,
           });
+        } catch (err) {
+          console.error(`Error copying message for slug ${slug}:`, err.description);
+          await ctx.reply(`⚠️ Couldn't send file (${slug}) — maybe deleted or private.`);
+          continue;
         }
       }
       return ctx.reply("✅ All files sent successfully!");
@@ -69,9 +78,14 @@ export const startMsg = async (ctx) => {
     const file = await File.findOne({ slug: param });
     if (!file) return ctx.reply("⚠️ Invalid file link.");
 
-    await ctx.api.copyMessage(ctx.chat.id, file.chatId, file.messageId, {
-      protect_content: true,
-    });
+    try {
+      await ctx.api.copyMessage(ctx.chat.id, file.chatId, file.messageId, {
+        protect_content: true,
+      });
+    } catch (err) {
+      console.error(`Error :`, err.description);
+      await ctx.reply(`⚠️ Couldn't send file — maybe deleted or private.`);
+    }
   } catch (e) {
     console.error("Error in startMsg:", e);
     const keyboard = new InlineKeyboard().url(

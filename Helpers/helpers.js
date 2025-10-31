@@ -1,10 +1,4 @@
-// const escapeMarkdownSpecialChars = (text) => {
-//     // Regular expression that matches all characters with special meaning in MarkdownV2
-//     const markdownSpecialChars = /([\\_*[\]()~`>#+\-.!|])/g;
-  
-//     // Replace each special character with its escaped version
-//     return text.replace(markdownSpecialChars, '\\$1');
-//   };
+
 import { markdownv2 as format } from "telegram-format";
 export const escapeMarkdownSpecialChars = (text) => {
   // Escape special characters that can interfere with markdown formatting
