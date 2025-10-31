@@ -6,7 +6,7 @@
 //     return text.replace(markdownSpecialChars, '\\$1');
 //   };
 import { markdownv2 as format } from "telegram-format";
-const escapeMarkdownSpecialChars = (text) => {
+export const escapeMarkdownSpecialChars = (text) => {
   // Escape special characters that can interfere with markdown formatting
   const specialChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '.', '!', '|'];
   let escapedText = text;
@@ -18,6 +18,10 @@ const escapeMarkdownSpecialChars = (text) => {
  
   return escapedText;
 };
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 const addMarkdownFormatting = (text, entities) => {
     if(!entities) return text
@@ -81,41 +85,62 @@ const addMarkdownFormatting = (text, entities) => {
   };
 
 
-
   function extractData(inputString) {
-    // Strip the initial part like '/add' if needed
-    let input = inputString.replace(/^\/msg\s*/, "");
-
-    // Extract filters
-    const filterRegex = /"(.*?)"/g; // Matches content inside double quotes
-  const buttonRegex = /\[(.*?)\]\((.*?)\)/g; // Matches [button](url) pattern
-
-  // Extract filters
-  const filters = [];
-  let match;
-  while ((match = filterRegex.exec(input)) !== null) {
-    filters.push(match[1]);
+    // Remove command like /msg or /add from the start
+    let input = inputString.replace(/^\/(?:msg|add|del|rmv)\s*/, "").trim();
+  
+    // --- Extract buttons first ---
+    const buttonRegex = /\[(.*?)\]\((.*?)\)/g;
+    const buttons = [];
+    const buttonGroups = input.split("|");
+    let match;
+  
+    buttonGroups.forEach((group) => {
+      const groupButtons = [];
+      while ((match = buttonRegex.exec(group)) !== null) {
+        groupButtons.push({ text: match[1].trim(), url: match[2].trim() });
+      }
+      if (groupButtons.length > 0) {
+        buttons.push(groupButtons);
+      }
+    });
+  
+    // --- Remove all [text](url) patterns so they don't appear in filters ---
+    const inputWithoutButtons = input.replace(buttonRegex, "").trim();
+  
+    // --- Extract filters (quoted or unquoted) ---
+    const filterRegex = /"([^"]+)"|([^\s\[\]\(\)\|]+)/g;
+    const filters = [];
+    const urlPattern = /^(https?:\/\/|www\.)/i;
+  
+    while ((match = filterRegex.exec(inputWithoutButtons)) !== null) {
+      const value = (match[1] || match[2] || "").trim();
+  
+      // Skip empty, URL-like, or invalid text
+      if (
+        !value ||
+        value.startsWith("[") ||
+        value.startsWith("(") ||
+        value.includes("]") ||
+        value.includes(")") ||
+        value.includes("|") ||
+        urlPattern.test(value)
+      ) {
+        continue;
+      }
+  
+      filters.push(value);
+    }
+  
+    // Remove duplicates
+    const uniqueFilters = [...new Set(filters)];
+  
+    return {
+      name: uniqueFilters,
+      buttons,
+    };
   }
   
-  // Extract buttons into arrays based on '|' separator
-  const buttons = [];
-  const buttonGroups = input.split('|'); // Split input into groups based on '|'
-
-  buttonGroups.forEach(group => {
-    const groupButtons = [];
-    while ((match = buttonRegex.exec(group)) !== null) {
-      groupButtons.push({ text: match[1], url: match[2] });
-    }
-    if (groupButtons.length > 0) {
-      buttons.push(groupButtons);
-    }
-  });
-
-  return {
-    name: filters,
-    buttons: buttons,
-  };
-}
 
 
-  export {addMarkdownFormatting, extractData}
+  export {addMarkdownFormatting, extractData, escapeRegex}

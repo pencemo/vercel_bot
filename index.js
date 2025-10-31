@@ -1,19 +1,28 @@
-import { Bot } from "grammy";
+import { Api, Bot } from "grammy";
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { connection } from "./db/connection.js";
-import { addFilters, findFilter } from "./utils/filters.js";
+import { addFilters, deleteFilter, findFilter, removeFilter } from "./utils/filters.js";
+import { allFilters, registerFilterPagination } from "./utils/allFilters.js";
+import { startMsg } from "./utils/Start.js";
+import { batchCommand, doneCommand, fileSave } from "./utils/Batch.js";
+import { ADMIN_ID, BOT_TOKEN, GROUP_ID, SUB_CHANNEL_ID } from "./config.js";
+import User from "./db/User.js";
+import { forceSub, userMiddleWare } from "./utils/middleware.js";
+import Batch from "./db/Batch.js";
+import File from "./db/File.js";
+import { callBackMsg, refresh } from "./utils/callbacks.js";
 dotenv.config();
 
-const token = process.env.BOT_TOKEN;
 const port = process.env.PORT || 3000;
 
 const app = express();
 app.use(bodyParser.json());
 
-// Create a bot object
-const bot = new Bot(token);
+// Create a bot object 
+const bot = new Bot(BOT_TOKEN);
+export const api = new Api(BOT_TOKEN);
 
 app.post("/webhook", async (req, res) => {
   await bot.init();
@@ -43,30 +52,43 @@ const start = async () => {
   }
 };
 
-bot.use((ctx, next) => {
-  const groupId = process.env.GROUP_ID;
-  const admin = process.env.ADMIN_ID;
+bot.use(userMiddleWare);
 
-  if (ctx.chat.type === "private" && ctx.from.id != admin) {
-    return ctx.reply("You are not authorized to use this bot");
-  }
-  if (ctx.chat.type !== "private" && ctx.chat.id != groupId) {
-    return ctx.reply("You are not authorized to use this bot");
-  }
 
-  return next();
-});
+// bot.use(forceSub)
 
 bot.command("add", addFilters);  
-bot.command("start", (ctx) => ctx.reply("Welcome to the bot"));
+bot.command("del", deleteFilter);  
+bot.command("rmv", removeFilter);  
+bot.command("filters", allFilters);  
+bot.command("start", startMsg);
+bot.command("batch", batchCommand);
+bot.command("done", doneCommand);
+bot.command("id", (ctx) => ctx.reply("Your ID : "+ctx.from.id));
+bot.command("ping", (ctx) => ctx.reply("pong"));
+// bot.command("help", (ctx)=>{
+//   ctx.reply("This is help Command", {
+//     reply_markup: {
+//       inline_keyboard: [
+//         [{ text: "Help", callback_data: "help" }]
+//       ]
+//     }
+//   })
+// });
 
 bot.on("message:text", findFilter);
+bot.on(["message:document", "message:photo", "message:video"], fileSave);
 
-bot.catch((err, ctx) => {
-  console.error("Bot error:", err);
-  ctx.reply("An error occurred");
+bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerFilterPagination);
+bot.callbackQuery(/^refresh_(.+)$/, refresh);
+bot.on("callback_query:data", callBackMsg)
+
+bot.catch(async (err) => {
+  const ctx = err.ctx;
+  console.error("Bot error:", err.message);
+  await ctx.reply("An error occurred", err.message);
 });
-
+ 
 start();
 connection()
 
