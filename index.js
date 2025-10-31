@@ -7,11 +7,8 @@ import { addFilters, deleteFilter, findFilter, removeFilter } from "./utils/filt
 import { allFilters, registerFilterPagination } from "./utils/allFilters.js";
 import { startMsg } from "./utils/Start.js";
 import { batchCommand, doneCommand, fileSave } from "./utils/Batch.js";
-import { ADMIN_ID, BOT_TOKEN, GROUP_ID, SUB_CHANNEL_ID } from "./config.js";
-import User from "./db/User.js";
-import { forceSub, userMiddleWare } from "./utils/middleware.js";
-import Batch from "./db/Batch.js";
-import File from "./db/File.js";
+import { BOT_TOKEN } from "./config.js";
+import { userMiddleWare } from "./utils/middleware.js";
 import { callBackMsg, refresh } from "./utils/callbacks.js";
 dotenv.config();
 
@@ -21,7 +18,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Create a bot object 
-const bot = new Bot(BOT_TOKEN);
+export const bot = new Bot(BOT_TOKEN);
 export const api = new Api(BOT_TOKEN);
 
 app.post("/webhook", async (req, res) => {
@@ -54,9 +51,6 @@ const start = async () => {
 
 bot.use(userMiddleWare);
 
-
-// bot.use(forceSub)
-
 bot.command("add", addFilters);  
 bot.command("del", deleteFilter);  
 bot.command("rmv", removeFilter);  
@@ -66,15 +60,6 @@ bot.command("batch", batchCommand);
 bot.command("done", doneCommand);
 bot.command("id", (ctx) => ctx.reply("Your ID : "+ctx.from.id));
 bot.command("ping", (ctx) => ctx.reply("pong"));
-// bot.command("help", (ctx)=>{
-//   ctx.reply("This is help Command", {
-//     reply_markup: {
-//       inline_keyboard: [
-//         [{ text: "Help", callback_data: "help" }]
-//       ]
-//     }
-//   })
-// });
 
 bot.on("message:text", findFilter);
 bot.on(["message:document", "message:photo", "message:video"], fileSave);
