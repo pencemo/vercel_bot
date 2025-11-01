@@ -10,6 +10,7 @@ import { batchCommand, doneCommand, fileSave } from "./utils/Batch.js";
 import { BOT_TOKEN } from "./config.js";
 import { userMiddleWare } from "./utils/middleware.js";
 import { callBackMsg, refresh } from "./utils/callbacks.js";
+import { helpCommand, aboutCommand, banUser, unbanUser, toAdmin } from "./utils/commands.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -60,6 +61,12 @@ bot.command("batch", batchCommand);
 bot.command("done", doneCommand);
 bot.command("id", (ctx) => ctx.reply("Your ID : "+ctx.from.id));
 bot.command("ping", (ctx) => ctx.reply("pong"));
+bot.command("help", helpCommand);
+bot.command("about", aboutCommand);
+bot.command("ban", banUser);
+bot.command("unban", unbanUser);
+bot.command("toadmin", toAdmin);
+
 // bot.command("file", (ctx) => ctx.replyWithDocument("BQACAgUAAxkBAAIIGmkErVggOPcUYBvjUvWejgt9ZLwkAAJXGQACBdsoVNWVjztMV9AnNgQ"));
 
 bot.on("message:text", findFilter);

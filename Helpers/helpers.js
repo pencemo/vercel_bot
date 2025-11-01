@@ -1,6 +1,6 @@
 
-import { markdownv2 as format } from "telegram-format";
 export const escapeMarkdownSpecialChars = (text) => {
+  if(!text) return
   // Escape special characters that can interfere with markdown formatting
   const specialChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '.', '!', '|'];
   let escapedText = text;
