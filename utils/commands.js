@@ -46,7 +46,7 @@ export const unbanUser = async(ctx)=>{
 }
 
 export const toAdmin = async(ctx)=>{
-    const chat = ctx.message.text.replace(/^\/(?:toadmin)\s*/, "").trim() || ctx.message.reply_to_message.text
+    const chat = ctx?.message?.text?.replace(/^\/(?:toadmin)\s*/, "").trim() || ctx?.message?.reply_to_message?.text
 
     if(!chat) return ctx.reply("Please provide a chat or replay to a massage")
     try {

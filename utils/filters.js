@@ -120,9 +120,9 @@ const findFilter = async (ctx) => {
         : undefined;
 
     // escape markdown and reply
-    const safeText = escapeMarkdownV2(content);
+    // const safeText = escapeMarkdownV2(content);
 
-    return ctx.reply(safeText, {
+    return ctx.reply(content, {
       reply_markup: replyMarkup,
       reply_to_message_id: repId,
       parse_mode: "MarkdownV2",

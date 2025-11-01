@@ -35,20 +35,19 @@ export const startMsg = async (ctx) => {
 
       const {id} = ctx.from;
       const name = ctx.from.first_name || ctx.from.username || ctx.from.last_name || "User";
-      console.log(ctx.me);
       const firstname = escapeMarkdownSpecialChars(name)
       return ctx.reply(`Hi [${firstname}](tg://user?id=${id}) \n*Welcome to ${ctx.me.first_name} 👋*\n\n*I'm a support bot of pencemodesigs*📝\n\nUse /help for more\n\n★Join here 👉 @pencemodesign`,{ 
         parse_mode: 'MarkdownV2',
         disable_web_page_preview: true,
         reply_markup:{
           inline_keyboard: [
-              [
-                  { text: 'Support Group 👩‍💻', url: 'https://t.me/pencemodesign' }
-              ],
-              [
-                  { text: 'Help ⚙️', callback_data: 'help' },
-                  { text: 'About 📝', callback_data: 'about' }
-              ]
+            [
+              { text: 'Help ⚙️', callback_data: 'help' },
+              { text: 'About 📝', callback_data: 'about' }
+            ],
+            [
+                { text: 'Support Group 👩‍💻', url: 'https://t.me/pencemodesign' }
+            ]
           ]
       }
       });
