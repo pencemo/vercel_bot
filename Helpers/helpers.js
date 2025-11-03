@@ -39,7 +39,6 @@ const addMarkdownFormatting = (text, entities) => {
     entities.sort((a, b) => b.offset - a.offset);
   
     let formattedText = escapeMarkdownV2(text);
-    console.log(formattedText);
   
     // Apply formatting based on entities
     entities.forEach(entity => {

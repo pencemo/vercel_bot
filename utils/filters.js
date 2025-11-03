@@ -1,6 +1,6 @@
-import { isAdmin, isPrivateChat } from "../Helpers/isAdmin.js";
+import { isAdmin } from "../Helpers/isAdmin.js";
 import { Filter } from "../db/models.js";
-import { addMarkdownFormatting, escapeMarkdownSpecialChars, escapeMarkdownV2, escapeRegex, extractData } from "../Helpers/helpers.js";
+import { escapeRegex, extractData } from "../Helpers/helpers.js";
 
 const addFilters = async (ctx) => {
   if (!isAdmin(ctx.from.id)) {
@@ -38,7 +38,7 @@ const addFilters = async (ctx) => {
     if (isContent) {
       isContent.name.push(...data.name);
       isContent.buttons.push(...data.buttons);
-      isContent.entities.push(...replayText.entities);
+      // isContent.entities.push(...replayText.entities);
       await isContent.save();
       return ctx.reply(`Added filters for - ${data.name.join(", ")}`);
     }

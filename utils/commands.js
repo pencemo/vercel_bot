@@ -6,7 +6,7 @@ import {
   helpMarkup,
 } from "../Helpers/Utils.js";
 import { escapeMarkdownSpecialChars } from "../Helpers/helpers.js";
-import { isAdmin } from "../Helpers/isAdmin.js";
+import { isAdmin, isPrivateChat } from "../Helpers/isAdmin.js";
 import { ADMIN_ID } from "../config.js";
 import User from "../db/User.js";
 import { bot } from "../index.js";
@@ -168,4 +168,12 @@ export const delFiltersAll = async (ctx) => {
       ],
     },
   });
+}
+
+export const getId = (ctx) => {
+  if(isPrivateChat(ctx)){
+    ctx.reply("Your ID : "+ctx.from.id)
+  }else{
+    ctx.reply("Chat ID : "+ctx.chat.id)
+  }
 }

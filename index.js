@@ -10,7 +10,7 @@ import { batchCommand, deleteBatch, deleteLink, doneCommand, fileSave } from "./
 import { BOT_TOKEN } from "./config.js";
 import { userMiddleWare } from "./utils/middleware.js";
 import { callBackMsg, refresh } from "./utils/callbacks.js";
-import { helpCommand, aboutCommand, banUser, unbanUser, toAdmin, delBatchAll, delFileAll, delFiltersAll, banUsersList } from "./utils/commands.js";
+import { helpCommand, aboutCommand, banUser, unbanUser, toAdmin, delBatchAll, delFileAll, delFiltersAll, banUsersList, getId } from "./utils/commands.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -71,7 +71,7 @@ bot.command("filters", allFilters);
 bot.chatType("private").command("about", aboutCommand);
 bot.chatType("private").command("help", helpCommand);
 bot.chatType("private").command("toadmin", toAdmin);
-bot.command("id", (ctx) => ctx.reply("Your ID : "+ctx.from.id));
+bot.command("id", getId);
 bot.command("ping", (ctx) => ctx.reply("pong"));
 
 bot.on(["message:text", "edited_message:text"], findFilter);
