@@ -58,14 +58,15 @@ export const userMiddleWare = async (ctx, next) => {
       return next();
     }
   
-    if (user.isBlocked) {
+    if (user.isBlocked && !user.isAdmin) {
       return ctx.reply("🚫 You are blocked by admin.");
     }
   }else {
-    const id = ctx?.chat?.id;
+    const id =  String(ctx?.chat?.id)
+    const groupIds = GROUP_ID.split(",").map(g => g.trim());
 
     if(!id)return next()
-    if(id != GROUP_ID) {
+    if(!groupIds.includes(id)){
       return ctx.reply("I can't send massage here 😏")
     }
   }

@@ -1,10 +1,9 @@
 import { isAdmin, isPrivateChat } from "../Helpers/isAdmin.js";
 import { Filter } from "../db/models.js";
-import { addMarkdownFormatting, escapeMarkdownSpecialChars, escapeRegex, extractData } from "../Helpers/helpers.js";
+import { addMarkdownFormatting, escapeMarkdownSpecialChars, escapeMarkdownV2, escapeRegex, extractData } from "../Helpers/helpers.js";
 
 const addFilters = async (ctx) => {
   if (!isAdmin(ctx.from.id)) {
-    if (!isPrivateChat(ctx)) return; 
     return ctx.reply("🚫 Sorry, this feature is only available to admins.");
 }
   try {
@@ -12,10 +11,10 @@ const addFilters = async (ctx) => {
   if (!replayText) {
     return ctx.reply("Reply to a message to add filter");
   }
-  if (replayText.text.length > 4096) {
+  if (replayText?.text?.length > 4096) {
     return ctx.reply("Message is too long");
   }
-  if(!replayText.text) {
+  if(!replayText?.text) {
     return ctx.reply("Message is empty");
   }
     const { text } = ctx.message;
@@ -34,21 +33,23 @@ const addFilters = async (ctx) => {
     if (isFilter) {
       return ctx.reply("Filter name is already exists : "+exist);
     }
-    const contant = await addMarkdownFormatting(replayText.text, replayText.entities)
 
-    const isContent = await Filter.findOne({ contant });
+    const isContent = await Filter.findOne({ contant: replayText.text });
     if (isContent) {
       isContent.name.push(...data.name);
       isContent.buttons.push(...data.buttons);
+      isContent.entities.push(...replayText.entities);
       await isContent.save();
       return ctx.reply(`Added filters for - ${data.name.join(", ")}`);
     }
     const filter = new Filter({
-      ...data,
-      contant: await addMarkdownFormatting(
-        replayText.text,
-        replayText.entities
-      ),
+      name: data.name,
+      contant: replayText.text,
+      entities: replayText.entities,
+      buttons: [
+        ...(replayText?.reply_markup?.inline_keyboard ?? []),
+        ...(data.buttons ?? []),
+      ],
     });
     filter.save();
     ctx.reply(`Added filters for - ${data.name.join(", ")}`);
@@ -59,21 +60,16 @@ const addFilters = async (ctx) => {
 };
 
 
-function escapeMarkdownV2(text) { 
-  return text.replace(/([[\]()~>#+=|{}.!\\-])/g, '\\$1'); 
-}
-
-
 const findFilter = async (ctx) => {
-  const text = (ctx.message?.text || "").trim();
+  const text = (ctx.msg?.text || "").trim();
   if (!text) return ctx.reply("Message is empty");
 
-  const repId = ctx.message.reply_to_message
-    ? ctx.message.reply_to_message.message_id
-    : ctx.message.message_id;
+  const repId = ctx.msg?.reply_to_message
+    ? ctx.msg.reply_to_message.message_id
+    : ctx.msg.message_id;
 
   try {
-    const allFilters = await Filter.find({}, { name: 1, contant: 1, buttons: 1 }).lean();
+    const allFilters = await Filter.find({}, { name: 1, contant: 1, buttons: 1, entities: 1}).lean();
 
     if (!allFilters || allFilters.length === 0) {
       return ctx.reply("No filters available");
@@ -109,6 +105,7 @@ const findFilter = async (ctx) => {
     }
 
     // validate content
+    // const content = await addMarkdownFormatting(matchedFilter?.contant, matchedFilter?.entities)
     const content = matchedFilter.contant || "";
     if (!content) return ctx.reply("Message is empty");
     if (content.length > 4096) return ctx.reply("Message is too long");
@@ -120,12 +117,17 @@ const findFilter = async (ctx) => {
         : undefined;
 
     // escape markdown and reply
-    // const safeText = escapeMarkdownV2(content);
 
-    return ctx.reply(content, {
+    const entities = (matchedFilter?.entities || []).filter(ent => {
+      const end = ent?.offset + ent?.length;
+      return end <= [...content].length; // Count code points safely
+    });
+
+    return ctx.reply(matchedFilter.contant, {
+      entities: entities || [],
       reply_markup: replyMarkup,
       reply_to_message_id: repId,
-      parse_mode: "MarkdownV2",
+      // parse_mode: "MarkdownV2",
     });
   } catch (error) {
     console.error("Error in findFilter:", error);
@@ -138,7 +140,6 @@ const findFilter = async (ctx) => {
 const deleteFilter = async (ctx) => {
   const text = ctx.message.text;
   if (!isAdmin(ctx.from.id)) {
-    if (!isPrivateChat(ctx)) return; 
     return ctx.reply("🚫 Sorry, this feature is only available to admins.");
 }
 
@@ -174,7 +175,6 @@ const deleteFilter = async (ctx) => {
 
 const removeFilter = async (ctx) => {
   if (!isAdmin(ctx.from.id)) {
-    if (!isPrivateChat(ctx)) return; 
     return ctx.reply("🚫 Sorry, this feature is only available to admins.");
 }
   const text = ctx.message.text.replace(/\/rmv /, "");

@@ -24,6 +24,7 @@ export const refresh = async (ctx) => {
       }
   
       // ✅ Subscribed now, send the file or batch
+      await ctx.answerCallbackQuery();
       if (param.startsWith("batch_")) {
         const batch = await Batch.findOne({ batchId: param });
         if (!batch) return ctx.reply("⚠️ Invalid or expired batch link.");
@@ -73,6 +74,8 @@ export const refresh = async (ctx) => {
   }
 
 export const callBackMsg =  async (ctx) => {
+
+  await ctx.answerCallbackQuery();
 
     const data = ctx.callbackQuery.data;
     if(data == "help"){
@@ -128,5 +131,33 @@ export const callBackMsg =  async (ctx) => {
         disable_web_page_preview: true,
         reply_markup: {inline_keyboard : [[{text: "Back 🔙", callback_data: "admin"}]]},
       })
+    }
+    if(data == "delBatchYes"){
+      const batches = await Batch.deleteMany()
+      if(!batches) return ctx.editMessageText("⚠️ Error deleting batch")
+      return ctx.editMessageText("All Batch deleted succesfull 🗑️")
+    }
+    if(data == "delFileYes"){
+      const files = await File.deleteMany()
+      if(!files) return ctx.editMessageText("⚠️ Error deleting file")
+      return ctx.editMessageText("All File deleted succesfull 🗑️")
+    }
+    if(data == "delFilter"){
+      const filters = await Filter.deleteMany()
+      if(!filters) return ctx.editMessageText("⚠️ Error deleting filters")
+      return ctx.editMessageText("All Filters deleted succesfull 🗑️")
+    }
+    if(data == "unbanAll"){
+      const unbanUsers = await User.updateMany({isBlocked: true}, {isBlocked: false})
+      if(!unbanUsers) return ctx.editMessageText("⚠️ Error unban filters")
+      return ctx.editMessageText("Unban All users")
+    }
+    if(data == "delNo"){
+      // try {
+      //   await ctx.api.deleteMessage(ctx.callbackQuery.message.chat.id, ctx.callbackQuery.message.message_id);
+      //  } catch(err){
+      //   console.log(err);
+      //  }
+       return ctx.editMessageText("Canceld 🚫")
     }
   }

@@ -1,3 +1,4 @@
+import { ADMIN_ONLY_TEXT } from "../Helpers/Utils.js";
 import { generateSlug } from "../Helpers/generateSlug.js";
 import { isAdmin, isPrivateChat } from "../Helpers/isAdmin.js";
 import { BOT_USERNAME, CHANNEL_ID } from "../config.js";
@@ -8,8 +9,7 @@ const userBatchSessions = new Map();
 
 export const batchCommand = async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
-        if (!isPrivateChat(ctx)) return; 
-        return ctx.reply("🚫 Sorry, this feature is only available to admins.");
+        return ctx.reply(ADMIN_ONLY_TEXT);
       }
    
     userBatchSessions.set(ctx.from.id, []);
@@ -24,8 +24,7 @@ export const batchCommand = async (ctx) => {
 export const doneCommand = async (ctx) => {
     const userId = ctx.from.id;
     if (!isAdmin(ctx.from.id)) {
-        if (!isPrivateChat(ctx)) return; 
-        return ctx.reply("🚫 Sorry, this feature is only available to admins.");
+        return ctx.reply(ADMIN_ONLY_TEXT);
     }
     
     const batchList = userBatchSessions.get(userId);
@@ -57,8 +56,7 @@ export const fileSave = async (ctx) => {
     const userId = ctx.from.id;
   
     if (!isAdmin(ctx.from.id)) {
-        if (!isPrivateChat(ctx)) return; 
-        return ctx.reply("🚫 Sorry, this feature is only available to admins.");
+        return
     }
     // forward to storage channel
     const forwarded = await ctx.api.copyMessage(
@@ -91,3 +89,33 @@ export const fileSave = async (ctx) => {
       });
     }
   };
+
+
+  export const deleteBatch = async (ctx) => { 
+    if (!isAdmin(ctx.from.id)) {
+      return ctx.reply(ADMIN_ONLY_TEXT);
+  }
+    
+    const slug = ctx.match;
+    if(!slug) return ctx.reply("❗Please provide a valid batch slug.");
+    const batch = await Batch.findOne({ batchId: slug });
+    if (!batch) {
+      return ctx.reply("❗Batch not found.");
+    }
+    await batch.deleteOne();
+    ctx.reply("✅ Batch deleted.");
+  }
+
+  export const deleteLink = async (ctx) => {
+    if (!isAdmin(ctx.from.id)) {
+      return ctx.reply(ADMIN_ONLY_TEXT);
+  }
+    const slug = ctx.match;
+    if(!slug) return ctx.reply("❗Please provide a valid file slug.");
+    const file = await File.findOne({ slug });
+    if (!file) {
+      return ctx.reply("❗File not found.");
+    }
+    await file.deleteOne();
+    ctx.reply("✅ File deleted.");
+  }

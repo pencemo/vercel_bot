@@ -27,7 +27,15 @@ Admin commands
 \\/del \\- Delete a filters
 \\/add \\- Add a filters
 \\/rmv \\- Remove a filters
+
+\\/dellink \\- Delete a link
+\\/delbatch \\- Delete a batch
+\\/delallbatch \\- Delete all batchs
+\\/delallfile \\- Delete all files
+\\/delfiter \\- Delete all filters 
 `
+export const ADMIN_ONLY_TEXT = `Your not my admin 😏`
+
 
 export const helpMarkup = (isAdmin = false)=>{
     return {

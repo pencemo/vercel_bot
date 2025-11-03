@@ -9,6 +9,9 @@ const filterSchema = mongoose.Schema({
   contant : {
     type: String,
   },
+  entities: {
+    type: [{}],
+  },
   buttons: [{}]
 }, {timestamps: true});
 

@@ -1,4 +1,4 @@
-import { Api, Bot, webhookCallback } from "grammy";
+import { Api, Bot } from "grammy";
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
@@ -6,11 +6,11 @@ import { connection } from "./db/connection.js";
 import { addFilters, deleteFilter, findFilter, removeFilter } from "./utils/filters.js";
 import { allFilters, registerFilterPagination } from "./utils/allFilters.js";
 import { startMsg } from "./utils/Start.js";
-import { batchCommand, doneCommand, fileSave } from "./utils/Batch.js";
+import { batchCommand, deleteBatch, deleteLink, doneCommand, fileSave } from "./utils/Batch.js";
 import { BOT_TOKEN } from "./config.js";
 import { userMiddleWare } from "./utils/middleware.js";
 import { callBackMsg, refresh } from "./utils/callbacks.js";
-import { helpCommand, aboutCommand, banUser, unbanUser, toAdmin } from "./utils/commands.js";
+import { helpCommand, aboutCommand, banUser, unbanUser, toAdmin, delBatchAll, delFileAll, delFiltersAll, banUsersList } from "./utils/commands.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -52,31 +52,30 @@ const start = async () => {
 
 bot.use(userMiddleWare);
 
-bot.command("add", addFilters);  
-bot.command("del", deleteFilter);  
-bot.command("rmv", removeFilter);  
-bot.command("filters", allFilters);  
 bot.command("start", startMsg);
-bot.command("batch", batchCommand);
-bot.command("done", doneCommand);
+bot.chatType("private").command("add", addFilters);
+bot.chatType("private").command("del", deleteFilter);  
+bot.chatType("private").command("rmv", removeFilter);  
+bot.chatType("private").command("dellink", deleteLink);
+bot.chatType("private").command("delallbatch", delBatchAll);
+bot.chatType("private").command("delallfile", delFileAll);
+bot.chatType("private").command("delfiter", delFiltersAll);
+bot.chatType("private").command("batch", batchCommand);
+bot.chatType("private").command("delbatch", deleteBatch);
+bot.chatType("private").command("done", doneCommand);
+bot.chatType("private").command("ban", banUser);
+bot.chatType("private").command("unban", unbanUser);
+bot.chatType("private").command("banlist", banUsersList);
+bot.command("filters", allFilters);
+
+bot.chatType("private").command("about", aboutCommand);
+bot.chatType("private").command("help", helpCommand);
+bot.chatType("private").command("toadmin", toAdmin);
 bot.command("id", (ctx) => ctx.reply("Your ID : "+ctx.from.id));
 bot.command("ping", (ctx) => ctx.reply("pong"));
-bot.command("help", helpCommand);
-bot.command("about", aboutCommand);
-bot.command("ban", banUser);
-bot.command("unban", unbanUser);
-bot.command("toadmin", toAdmin);
 
-// bot.command("file", (ctx) => ctx.replyWithDocument("BQACAgUAAxkBAAIIGmkErVggOPcUYBvjUvWejgt9ZLwkAAJXGQACBdsoVNWVjztMV9AnNgQ"));
-
-bot.on("message:text", findFilter);
-// bot.on("message:file", (ctx)=>{
-//   console.log(ctx.message);
-//   if(ctx){
-//     ctx.reply(ctx.message.document.file_id);
-//   }
-// })
-bot.on(["message:document", "message:photo", "message:video"], fileSave);
+bot.on(["message:text", "edited_message:text"], findFilter);
+bot.chatType("private").on(["message:document", "message:photo", "message:video"], fileSave);
 
 bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerFilterPagination);
 bot.callbackQuery(/^refresh_(.+)$/, refresh);
@@ -84,10 +83,18 @@ bot.on("callback_query:data", callBackMsg)
 
 bot.catch(async (err) => {
   const ctx = err.ctx;
-  console.error("Bot error:", err.message);
-  await ctx.reply("An error occurred", err.message);
+  console.error("Bot error:", err);
+  await ctx.reply("An error occurred 😥");
 });
- 
+
+// bot.command("file", (ctx) => ctx.replyWithDocument("BQACAgUAAxkBAAIIGmkErVggOPcUYBvjUvWejgt9ZLwkAAJXGQACBdsoVNWVjztMV9AnNgQ"));
+// bot.on("message:file", (ctx)=>{
+//   console.log(ctx.message);
+//   if(ctx){
+//     ctx.reply(ctx.message.document.file_id);
+//   }
+// })
+
 start();
 connection()
 

@@ -17,12 +17,29 @@ function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// utils/markdown.js
+export function escapeMarkdownV2(text = "") {
+  if (typeof text !== "string") text = String(text);
+
+  // 1️⃣ Escape backslashes first
+  text = text.replace(/\\/g, "\\\\");
+
+  // 2️⃣ Escape all special MarkdownV2 characters
+  //    `_ * [ ] ( ) ~ ` > # + - = | { } . !`
+  //    Hyphen '-' and dot '.' are placed at the END of the character class
+  return text.replace(/([_*\[\]()~`>#+=|{}!\.-])/g, "\\$1");
+}
+
+
+
+
 const addMarkdownFormatting = (text, entities) => {
     if(!entities) return text
     // Sort entities by offset in descending order to avoid issues with overlapping ranges
     entities.sort((a, b) => b.offset - a.offset);
   
-    let formattedText = escapeMarkdownSpecialChars(text);
+    let formattedText = escapeMarkdownV2(text);
+    console.log(formattedText);
   
     // Apply formatting based on entities
     entities.forEach(entity => {

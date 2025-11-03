@@ -1,12 +1,24 @@
 import { InlineKeyboard } from "grammy";
-import { isAdmin } from "../Helpers/isAdmin.js";
-import { CHANNEL_USERNAME, SUB_CHANNEL_ID } from "../config.js";
+import { isAdmin, isPrivateChat } from "../Helpers/isAdmin.js";
+import { BOT_USERNAME, CHANNEL_USERNAME, SUB_CHANNEL_ID } from "../config.js";
 import Batch from "../db/Batch.js";
 import File from "../db/File.js";
 import { api } from "../index.js";
 import { escapeMarkdownSpecialChars } from "../Helpers/helpers.js";
 
 export const startMsg = async (ctx) => {
+  if(!isPrivateChat(ctx)){
+    return ctx.reply("Yes, I'm alive...", {
+      reply_to_message_id: ctx.message.message_id,
+      reply_markup:{
+        inline_keyboard: [
+          [
+              { text: 'Go Here 🚀', url: `https://t.me/${BOT_USERNAME}` }
+          ]
+        ]
+    }
+    });
+  }
   const chatId = ctx.from?.id;
   if (!chatId) return;
 
