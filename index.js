@@ -34,7 +34,7 @@ app.post("/webhook", async (req, res) => {
     console.error("Error handling webhook update:", error);
     res.status(500).send("Internal Server Error");
   }
-});
+}); 
 
 const start = async () => {
   const url = `${process.env.WEBHOOK_URL}/webhook`;

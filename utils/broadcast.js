@@ -35,9 +35,9 @@ export const broadcast = async (ctx) => {
       .text("❌ Cancel", "bc:cancel");
   
     await ctx.reply(
-      `Broadcast to ~${usersCount} users.\n` +
-        "This will send the *same message* to all.\n\nConfirm?",
-      { reply_markup: keyboard, parse_mode: "MarkdownV2" }
+      `Broadcast to ~${usersCount} users\n` +
+        "This will send the *same message* to all\n\nConfirm?",
+      { reply_markup: keyboard, parse_mode: "Markdown" }
     );
   };
   
