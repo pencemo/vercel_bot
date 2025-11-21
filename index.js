@@ -11,6 +11,8 @@ import { BOT_TOKEN } from "./config.js";
 import { userMiddleWare } from "./utils/middleware.js";
 import { callBackMsg, refresh } from "./utils/callbacks.js";
 import { helpCommand, aboutCommand, banUser, unbanUser, toAdmin, delBatchAll, delFileAll, delFiltersAll, banUsersList, getId } from "./utils/commands.js";
+import { qrCallback, qrcode } from "./utils/Qrcode.js";
+import { broadcast, broadcastCallback } from "./utils/broadcast.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -71,13 +73,17 @@ bot.command("filters", allFilters);
 bot.chatType("private").command("about", aboutCommand);
 bot.chatType("private").command("help", helpCommand);
 bot.chatType("private").command("toadmin", toAdmin);
+bot.chatType("private").command("broadcast", broadcast);
+bot.chatType("private").command("qrcode", qrcode)
 bot.command("id", getId);
 bot.command("ping", (ctx) => ctx.reply("pong"));
 
 bot.on(["message:text", "edited_message:text"], findFilter);
-bot.chatType("private").on(["message:document", "message:photo", "message:video"], fileSave);
+bot.chatType("private").on(["message:document", "message:video"], fileSave);
 
-bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerFilterPagination);
+bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerFilterPagination); 
+bot.callbackQuery(/^qr:(png|jpg|svg)$/, qrCallback); 
+bot.callbackQuery(["bc:confirm", "bc:cancel"], broadcastCallback); 
 bot.callbackQuery(/^refresh_(.+)$/, refresh);
 bot.on("callback_query:data", callBackMsg)
 
@@ -87,13 +93,25 @@ bot.catch(async (err) => {
   await ctx.reply("An error occurred 😥");
 });
 
-// bot.command("file", (ctx) => ctx.replyWithDocument("BQACAgUAAxkBAAIIGmkErVggOPcUYBvjUvWejgt9ZLwkAAJXGQACBdsoVNWVjztMV9AnNgQ"));
-// bot.on("message:file", (ctx)=>{
+// bot.on("message:document", async (ctx) => {
+//   console.log(ctx.message); // check what you get here
+
+//   const doc = ctx.message.document;
+//   if (!doc) return; // safety, but normally not needed for this filter
+
+//   await ctx.replyWithDocument(doc.file_id);
+// });
+
+// bot.on("message:photo", async (ctx) => {
 //   console.log(ctx.message);
-//   if(ctx){
-//     ctx.reply(ctx.message.document.file_id);
-//   }
-// })
+
+//   const photos = ctx.message.photo;      // PhotoSize[]
+//   const largestPhoto = photos.at(-1);
+//   const fileId = largestPhoto.file_id;
+
+//   await ctx.replyWithPhoto(fileId);
+// });
+
 
 start();
 connection()

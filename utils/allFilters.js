@@ -2,7 +2,7 @@ import { Filter } from "../db/models.js";
 
 import { InlineKeyboard } from "grammy";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 20;
 
 // In-memory pagination state (keyed by user ID)
 const userPages = new Map();
@@ -69,9 +69,9 @@ export const registerFilterPagination =  async (ctx) => {
       //   "Loading filters...",
       //   { reply_markup: undefined }
       // );
+      await ctx.answerCallbackQuery();
       await sendFilterPage(ctx, page, totalFilters, true);
 
-      await ctx.answerCallbackQuery();
     } catch (err) {
       console.error("❌ Pagination error:", err);
       await ctx.answerCallbackQuery({ text: "Error loading page", show_alert: true });

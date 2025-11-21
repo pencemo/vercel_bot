@@ -5,36 +5,45 @@ import { escapeRegex, extractData } from "../Helpers/helpers.js";
 const addFilters = async (ctx) => {
   if (!isAdmin(ctx.from.id)) {
     return ctx.reply("🚫 Sorry, this feature is only available to admins.");
-}
+  }
   try {
-  const replayText = ctx.message.reply_to_message;
-  if (!replayText) {
-    return ctx.reply("Reply to a message to add filter");
-  }
-  if (replayText?.text?.length > 4096) {
-    return ctx.reply("Message is too long");
-  }
-  if(!replayText?.text) {
-    return ctx.reply("Message is empty");
-  }
+    const replayText = ctx.message.reply_to_message;
+    if (!replayText) {
+      return ctx.reply("Reply to a message to add filter");
+    }
+    if (replayText?.text?.length > 4096) {
+      return ctx.reply("Message is too long");
+    }
+    let fileId = "";
+    if (replayText?.photo) {
+      const largestPhoto = replayText.photo.at(-1);
+      fileId = largestPhoto.file_id;
+    }
+
+    const contant = replayText?.text || replayText?.caption;
+// return console.log(replayText);
+    if (!contant) {
+      return ctx.reply("Message is empty");
+    }
     const { text } = ctx.message;
     const data = extractData(text);
-    if(data.name.length == 0) {
+    if (data.name.length == 0) {
       return ctx.reply("Send a valid filter name");
     }
-    
-    
+
     const isFilter = await Filter.findOne({
       name: {
         $in: data.name.map((n) => new RegExp(`^${escapeRegex(n)}$`, "i")),
       },
     });
-    const exist = data.name.filter((name) => isFilter?.name?.includes(name)).join(", ");
+    const exist = data.name
+      .filter((name) => isFilter?.name?.includes(name))
+      .join(", ");
     if (isFilter) {
-      return ctx.reply("Filter name is already exists : "+exist);
+      return ctx.reply("Filter name is already exists : " + exist);
     }
 
-    const isContent = await Filter.findOne({ contant: replayText.text });
+    const isContent = await Filter.findOne({ contant: contant });
     if (isContent) {
       isContent.name.push(...data.name);
       isContent.buttons.push(...data.buttons);
@@ -42,23 +51,26 @@ const addFilters = async (ctx) => {
       await isContent.save();
       return ctx.reply(`Added filters for - ${data.name.join(", ")}`);
     }
+    const entities = replayText?.entities || replayText?.caption_entities
     const filter = new Filter({
       name: data.name,
-      contant: replayText.text,
-      entities: replayText.entities,
+      contant: contant,
+      entities: entities,
+      fileId: fileId,
       buttons: [
         ...(replayText?.reply_markup?.inline_keyboard ?? []),
         ...(data.buttons ?? []),
       ],
     });
     filter.save();
-    ctx.reply(`Added filters for - ${data.name.join(", ")}`);
+    ctx.reply(`Added - \`${data.name.join(" , ")}\``, {
+      parse_mode: "Markdown",
+    });
   } catch (error) {
     console.log(error);
     ctx.reply("Error adding filter");
   }
 };
-
 
 const findFilter = async (ctx) => {
   const text = (ctx.msg?.text || "").trim();
@@ -69,7 +81,10 @@ const findFilter = async (ctx) => {
     : ctx.msg.message_id;
 
   try {
-    const allFilters = await Filter.find({}, { name: 1, contant: 1, buttons: 1, entities: 1}).lean();
+    const allFilters = await Filter.find(
+      {},
+      { name: 1, contant: 1, buttons: 1, entities: 1, fileId: 1 }
+    ).lean();
 
     if (!allFilters || allFilters.length === 0) {
       return ctx.reply("No filters available");
@@ -101,7 +116,7 @@ const findFilter = async (ctx) => {
     }
 
     if (!matchedFilter) {
-      return 
+      return;
     }
 
     // validate content
@@ -118,30 +133,37 @@ const findFilter = async (ctx) => {
 
     // escape markdown and reply
 
-    const entities = (matchedFilter?.entities || []).filter(ent => {
+    const entities = (matchedFilter?.entities || []).filter((ent) => {
       const end = ent?.offset + ent?.length;
       return end <= [...content].length; // Count code points safely
     });
 
-    return ctx.reply(matchedFilter.contant, {
-      entities: entities || [],
-      reply_markup: replyMarkup,
-      reply_to_message_id: repId,
-      // parse_mode: "MarkdownV2",
-    });
+    if(matchedFilter.fileId){
+      return await ctx.replyWithPhoto(matchedFilter.fileId, {
+        caption: content,
+        reply_markup: replyMarkup,
+        reply_to_message_id: repId,
+        caption_entities: entities
+      });
+    }else{
+      return await ctx.reply(matchedFilter.contant, {
+        entities: entities || [],
+        reply_markup: replyMarkup,
+        reply_to_message_id: repId,
+      });
+    }
+
   } catch (error) {
     console.error("Error in findFilter:", error);
     return ctx.reply("Error while finding filter");
   }
 };
 
-
- 
 const deleteFilter = async (ctx) => {
   const text = ctx.message.text;
   if (!isAdmin(ctx.from.id)) {
     return ctx.reply("🚫 Sorry, this feature is only available to admins.");
-}
+  }
 
   try {
     const filterKey = extractData(text);
@@ -166,7 +188,6 @@ const deleteFilter = async (ctx) => {
     }
 
     return ctx.reply(`🗑️  Deleted filter(s): ${filterKey.name.join(", ")}`);
-
   } catch (error) {
     console.error("❌ Error in deleteFilter:", error);
     return ctx.reply("An error occurred while deleting filter(s).");
@@ -176,26 +197,25 @@ const deleteFilter = async (ctx) => {
 const removeFilter = async (ctx) => {
   if (!isAdmin(ctx.from.id)) {
     return ctx.reply("🚫 Sorry, this feature is only available to admins.");
-}
+  }
   const text = ctx.message.text.replace(/\/rmv /, "");
-  try{
+  try {
     const filter = await Filter.findOne({
       name: { $regex: new RegExp(`^${text}$`, "i") },
     });
     if (!filter) {
       return ctx.reply("Filter not found");
     }
-    if(filter.name.length == 1) {
+    if (filter.name.length == 1) {
       return ctx.reply("Only one filter exist, use /del to delete filter");
     }
     filter.name = filter.name.filter((name) => name !== text);
     await filter.save();
     ctx.reply(`Removed filter - ${text}`);
-  }catch (error) {
+  } catch (error) {
     console.log(error);
     ctx.reply("Error removing filter");
   }
-}
-
+};
 
 export { addFilters, findFilter, deleteFilter, removeFilter };

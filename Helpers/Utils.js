@@ -7,6 +7,7 @@ How can I assist you today?
 \\/id \\- Get your Telegram ID
 \\/ping \\- Check if the bot is online
 \\/toadmin \\- Send message to admin
+\\/qrcode \\- Generate a QR code
 `
 
 export const ABOUT_TEXT = `📄 *About me*
@@ -27,6 +28,7 @@ Admin commands
 \\/del \\- Delete a filters
 \\/add \\- Add a filters
 \\/rmv \\- Remove a filters
+\\/broadcast \\- Replay to msg
 
 \\/dellink \\- Delete a link
 \\/delbatch \\- Delete a batch
