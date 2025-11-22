@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema({
     lastName: String,
     isAdmin: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
+    mode: {type: String, default: "filter"},
   });
   
   const User = mongoose.model("User", UserSchema);

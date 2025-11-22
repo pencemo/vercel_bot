@@ -6,13 +6,14 @@ import { connection } from "./db/connection.js";
 import { addFilters, deleteFilter, findFilter, removeFilter } from "./utils/filters.js";
 import { allFilters, registerFilterPagination } from "./utils/allFilters.js";
 import { startMsg } from "./utils/Start.js";
-import { batchCommand, deleteBatch, deleteLink, doneCommand, fileSave } from "./utils/Batch.js";
+import { batchCommand, deleteBatch, deleteLink, doneCommand, fileSave, getLink, updateBatch } from "./utils/Batch.js";
 import { BOT_TOKEN } from "./config.js";
 import { userMiddleWare } from "./utils/middleware.js";
 import { callBackMsg, refresh } from "./utils/callbacks.js";
 import { helpCommand, aboutCommand, banUser, unbanUser, toAdmin, delBatchAll, delFileAll, delFiltersAll, banUsersList, getId } from "./utils/commands.js";
 import { qrCallback, qrcode } from "./utils/Qrcode.js";
 import { broadcast, broadcastCallback } from "./utils/broadcast.js";
+import { settingsCommand, settingsMenu } from "./utils/Settings.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -53,6 +54,7 @@ const start = async () => {
 };
 
 bot.use(userMiddleWare);
+bot.use(settingsMenu);
 
 bot.command("start", startMsg);
 bot.chatType("private").command("add", addFilters);
@@ -62,8 +64,10 @@ bot.chatType("private").command("dellink", deleteLink);
 bot.chatType("private").command("delallbatch", delBatchAll);
 bot.chatType("private").command("delallfile", delFileAll);
 bot.chatType("private").command("delfiter", delFiltersAll);
+bot.chatType("private").command("link", getLink);
 bot.chatType("private").command("batch", batchCommand);
 bot.chatType("private").command("delbatch", deleteBatch);
+bot.chatType("private").command("addtobatch", updateBatch);
 bot.chatType("private").command("done", doneCommand);
 bot.chatType("private").command("ban", banUser);
 bot.chatType("private").command("unban", unbanUser);
@@ -75,11 +79,12 @@ bot.chatType("private").command("help", helpCommand);
 bot.chatType("private").command("toadmin", toAdmin);
 bot.chatType("private").command("broadcast", broadcast);
 bot.chatType("private").command("qrcode", qrcode)
+bot.chatType("private").command("settings", settingsCommand)
 bot.command("id", getId);
 bot.command("ping", (ctx) => ctx.reply("pong"));
 
 bot.on(["message:text", "edited_message:text"], findFilter);
-bot.chatType("private").on(["message:document", "message:video"], fileSave);
+bot.on(["message:document", "message:video"], fileSave); //.chatType(["supergroup", "group"])
 
 bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerFilterPagination); 
 bot.callbackQuery(/^qr:(png|jpg|svg)$/, qrCallback); 

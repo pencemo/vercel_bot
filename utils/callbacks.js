@@ -38,9 +38,7 @@ export const refresh = async (ctx) => {
           }
         
           try {
-            await ctx.api.copyMessage(ctx.chat.id, file.chatId, file.messageId, {
-              protect_content: true,
-            });
+            await ctx.api.copyMessage(ctx.chat.id, file.chatId, file.messageId);
           } catch (err) {
             console.error(`Error copying message for slug ${slug}:`, err.description);
             await ctx.reply(`⚠️ Couldn't send file (${slug}) — maybe deleted or private.`);
@@ -57,9 +55,7 @@ export const refresh = async (ctx) => {
       await ctx.editMessageText("✅ You’re verified! Sending your file...");
       
     try {
-      await ctx.api.copyMessage(ctx.chat.id, file.chatId, file.messageId, {
-        protect_content: true,
-      });
+      await ctx.api.copyMessage(ctx.chat.id, file.chatId, file.messageId);
     } catch (err) {
       console.error(`Error :`, err.description);
       await ctx.reply(`⚠️ Couldn't send file — maybe deleted or private.`);

@@ -23,7 +23,9 @@ Admin commands
 \\/ban \\- Ban a user
 \\/unban \\- Unban a user
 \\/batch \\- Create batch link
+\\/link \\- Create link
 \\/done \\- Batch done
+\\/addtobatch \\- Add file to batch 
 \\/filters \\- All filters
 \\/del \\- Delete a filters
 \\/add \\- Add a filters

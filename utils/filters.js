@@ -1,6 +1,9 @@
 import { isAdmin } from "../Helpers/isAdmin.js";
 import { Filter } from "../db/models.js";
 import { escapeRegex, extractData } from "../Helpers/helpers.js";
+import { InlineKeyboard } from "grammy";
+import User from "../db/User.js";
+import { convertCommand } from "../Helpers/converter/ConvertCommand.js";
 
 const addFilters = async (ctx) => {
   if (!isAdmin(ctx.from.id)) {
@@ -43,13 +46,16 @@ const addFilters = async (ctx) => {
       return ctx.reply("Filter name is already exists : " + exist);
     }
 
+    const keyboard = new InlineKeyboard().copyText("Copy Name ✨",data?.name[0])
     const isContent = await Filter.findOne({ contant: contant });
     if (isContent) {
       isContent.name.push(...data.name);
       isContent.buttons.push(...data.buttons);
       // isContent.entities.push(...replayText.entities);
       await isContent.save();
-      return ctx.reply(`Added filters for - ${data.name.join(", ")}`);
+      return ctx.reply(`Added - ${data.name.join(", ")}`, {
+        reply_markup: keyboard,
+      });
     }
     const entities = replayText?.entities || replayText?.caption_entities
     const filter = new Filter({
@@ -65,6 +71,7 @@ const addFilters = async (ctx) => {
     filter.save();
     ctx.reply(`Added - \`${data.name.join(" , ")}\``, {
       parse_mode: "Markdown",
+      reply_markup: keyboard,
     });
   } catch (error) {
     console.log(error);
@@ -73,6 +80,15 @@ const addFilters = async (ctx) => {
 };
 
 const findFilter = async (ctx) => {
+  const chatType = ctx.chat.type;
+  if(chatType === "private"){
+    const user = await User.findOne({ chatId: ctx.from.id });
+    if (user && user?.mode !== "filter") {
+      convertCommand(ctx)
+      return
+    }
+  }
+
   const text = (ctx.msg?.text || "").trim();
   if (!text) return ctx.reply("Message is empty");
 
