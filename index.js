@@ -90,7 +90,7 @@ bot.on(["message:text", "edited_message:text"], findFilter);
 bot.on(["message:document", "message:video"], fileSave); 
 
 bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerFilterPagination); 
-bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerUserPagination); 
+bot.callbackQuery(/users_page_/, registerUserPagination); 
 bot.callbackQuery(/^qr:(png|jpg|svg)$/, qrCallback); 
 bot.callbackQuery(["bc:confirm", "bc:cancel"], broadcastCallback); 
 bot.callbackQuery(/^refresh_(.+)$/, refresh);

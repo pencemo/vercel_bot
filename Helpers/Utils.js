@@ -53,7 +53,7 @@ export const SETTINGS_TEXT = `⚙️ Settings\n\nChoose your mode:\n\n*Filter :*
 export const helpMarkup = (isAdmin = false)=>{
     return {
         inline_keyboard: [
-            (isAdmin ? [{ text: 'Admin ⚙️', callback_data: 'admin' }]: []),
+            (isAdmin ? [{ text: 'Admin 🥷', callback_data: 'admin' }]: []),
             [
                 { text: 'Settings ⚙️', callback_data: 'settings' },
                 { text: 'About 📝', callback_data: 'about' }

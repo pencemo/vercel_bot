@@ -93,7 +93,7 @@ export const broadcast = async (ctx) => {
     const users = await User.find({ isBlocked: { $ne: true } }).lean();
   
     const CHUNK_SIZE = 25;         // messages per batch
-    const SLEEP_BETWEEN = 10000;    // ms between batches
+    const SLEEP_BETWEEN = 1000;    // ms between batches
   
     let success = 0;
     let failed = 0;
