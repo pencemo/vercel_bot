@@ -69,10 +69,14 @@ export const broadcast = async (ctx) => {
     // start broadcast
     const date = Date.now();
     broadcastToAllUsers(ctx, info.chatId, info.messageId, info.button) 
-      .then(async ({ success, failed }) => {
+      .then(async ({ success, failed, failedIds, total }) => {
+        await User.updateMany({ _id: { $in: failedIds } }, { $set: { isBlocked: true } });
         const sec =  Math.ceil((Date.now() - date) / 1000);
+        const minutes = Math.floor(sec / 60);
+        const seconds = sec % 60;
+        const formatted = `${minutes}:${seconds.toString().padStart(2, "0")}`;
         await ctx.reply(
-          `Broadcast finished.\n\n✅ Sent: ${success}\n❌ Failed: ${failed}\n🕛 Time : ${sec} sec`
+          `Broadcast finished.\n\n✅ Sent: ${success}\n❌ Failed: ${failed}\n🕵️‍♂️ Total : ${total}\n🕛 Time : ${formatted} M`
         );
       })
       .catch(async (err) => {
@@ -89,10 +93,11 @@ export const broadcast = async (ctx) => {
     const users = await User.find({ isBlocked: { $ne: true } }).lean();
   
     const CHUNK_SIZE = 25;         // messages per batch
-    const SLEEP_BETWEEN = 1000;    // ms between batches
+    const SLEEP_BETWEEN = 10000;    // ms between batches
   
     let success = 0;
     let failed = 0;
+    let failedIds = []
   
     for (let i = 0; i < users.length; i++) {
       const user = users[i];
@@ -111,7 +116,7 @@ export const broadcast = async (ctx) => {
         success++;
       } catch (err) {
         failed++;
-        
+        failedIds.push(user._id)
         console.error(`Failed to send to ${user.chatId}:`, err.description);
       }
   
@@ -121,6 +126,6 @@ export const broadcast = async (ctx) => {
       }
     }
   
-    return { success, failed };
+    return { success, failed, failedIds, total: users.length};
   }
   

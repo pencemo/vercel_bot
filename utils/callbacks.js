@@ -2,11 +2,12 @@ import { api } from "../index.js";
 import Batch from "../db/Batch.js";
 import File from "../db/File.js";
 import { SUB_CHANNEL_ID } from "../config.js";
-import { ABOUT_TEXT, ADMIN_TEXT, HELP_TEXT, aboutMarkup, adminMarkup, helpMarkup } from "../Helpers/Utils.js";
+import { ABOUT_TEXT, ADMIN_TEXT, HELP_TEXT, SETTINGS_TEXT, aboutMarkup, adminMarkup, helpMarkup } from "../Helpers/Utils.js";
 import { escapeMarkdownSpecialChars } from "../Helpers/helpers.js";
 import { isAdmin } from "../Helpers/isAdmin.js";
 import User from "../db/User.js";
 import { Filter } from "../db/models.js";
+import { settingsMenu } from "./Settings.js";
 
 export const refresh = async (ctx) => {
     const param = ctx.match[1];
@@ -89,6 +90,13 @@ export const callBackMsg =  async (ctx) => {
         reply_markup: aboutMarkup,
       }) 
     }
+    if(data == "settings"){
+      return ctx.editMessageText(SETTINGS_TEXT, {
+        parse_mode: "MarkdownV2",
+        disable_web_page_preview: true,
+        reply_markup: settingsMenu,
+      }) 
+    }
     if(data == "admin"){
       return ctx.editMessageText(ADMIN_TEXT, {
         parse_mode: "MarkdownV2",
@@ -98,7 +106,10 @@ export const callBackMsg =  async (ctx) => {
     }
     if(data == "users"){
       const usersCount = await User.countDocuments()
-      return ctx.editMessageText("Users count: "+usersCount, {
+      const blocked = await User.countDocuments({isBlocked: true})
+      const banned = await User.countDocuments({isBan: true})
+      
+      return ctx.editMessageText(`*Users count*\n\nTotal : ${usersCount}\nBlocked : ${blocked}\nBannded : ${banned} \n\n*Use /userlist to get all user list*`, {
         parse_mode: "MarkdownV2",
         disable_web_page_preview: true,
         reply_markup: {inline_keyboard : [[{text: "Back 🔙", callback_data: "admin"}]]},

@@ -2,7 +2,7 @@ import { Filter } from "../db/models.js";
 
 import { InlineKeyboard } from "grammy";
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 10;
 
 // In-memory pagination state (keyed by user ID)
 const userPages = new Map();
@@ -32,7 +32,8 @@ async function sendFilterPage(ctx, page, totalFilters, isEdited = false) {
     .skip(skip)
     .limit(ITEMS_PER_PAGE);
 
-  const filterNames = filters.map((f) => f.name).join("\n- ");
+  const filterNames = filters.map((f) => f?.name?.map((n)=> `- \`${n}\` \n`))?.flat().join('')
+    
   const totalPages = Math.ceil(totalFilters / ITEMS_PER_PAGE);
 
   // Create keyboard
@@ -45,7 +46,7 @@ async function sendFilterPage(ctx, page, totalFilters, isEdited = false) {
   userPages.set(ctx.from.id, page);
   
 
-  const message = `📄 *All Filters (Page ${page + 1}/${totalPages}:${totalFilters})*\n\n- ${filterNames}`;
+  const message = `📄 *All Filters (Page ${page + 1}/${totalPages}:${totalFilters})*\n\n${filterNames}`;
   if(isEdited){
     return await ctx.editMessageText(message, {
       parse_mode: "Markdown",

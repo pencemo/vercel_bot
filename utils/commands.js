@@ -5,7 +5,6 @@ import {
   aboutMarkup,
   helpMarkup,
 } from "../Helpers/Utils.js";
-import { escapeMarkdownSpecialChars } from "../Helpers/helpers.js";
 import { isAdmin, isPrivateChat } from "../Helpers/isAdmin.js";
 import { ADMIN_ID } from "../config.js";
 import User from "../db/User.js";
@@ -38,7 +37,7 @@ export const banUser = async (ctx) => {
 
   const user = await User.findOneAndUpdate(
     { username: username },
-    { isBlocked: true }
+    { isBan: true }
   );
   if (!user) return ctx.reply("User not found");
   ctx.reply(`@${username} has been banned`);
@@ -51,7 +50,7 @@ export const banUsersList = async (ctx) => {
   }
 
   // Fetch all blocked users
-  const users = await User.find({ isBlocked: true });
+  const users = await User.find({ isBan: true });
 
   if (!users || users.length === 0) {
     return ctx.reply("🚫 No banned users found.");
@@ -86,7 +85,7 @@ export const banUsersList = async (ctx) => {
 
 export const unbanUser = async (ctx) => {
   if (!isAdmin(ctx.from.id)) {
-    return ctx.reply("ADMIN_ONLY_TEXT");
+    return ctx.reply(ADMIN_ONLY_TEXT);
   }
   const username = ctx.message.text.replace(/^\/(?:unban)\s*/, "").trim();
 
@@ -94,7 +93,7 @@ export const unbanUser = async (ctx) => {
 
   const user = await User.findOneAndUpdate(
     { username: username },
-    { isBlocked: false }
+    { isBan: false }
   );
 
   if (!user) return ctx.reply("User not found");
@@ -106,11 +105,11 @@ export const toAdmin = async (ctx) => {
   const chat =
     ctx?.message?.text?.replace(/^\/(?:toadmin)\s*/, "").trim() ||
     ctx?.message?.reply_to_message?.text;
-  if (!chat) return ctx.reply("Please provide a chat or replay to a massage");
+  if (!chat) return ctx.reply("Please send /toadmin <MSG> or replay to a massage");
   try {
     await bot.api.sendMessage(
       ADMIN_ID,
-      `💌 Message from @${ctx?.from?.username}\n\n ${chat}`
+      `Id : ${ctx?.from?.id}\n\n 💌 Message from @${ctx?.from?.username}\n\n ${chat}`
     );
     ctx.reply("Message sent to admin");
   } catch (error) {
@@ -175,5 +174,33 @@ export const getId = (ctx) => {
     ctx.reply("Your ID : "+ctx.from.id)
   }else{
     ctx.reply("Chat ID : "+ctx.chat.id)
+  }
+}
+
+
+export const toUsr = async (ctx) => {
+  if (!isAdmin(ctx.from.id)) {
+    return ctx.reply(ADMIN_ONLY_TEXT);
+  }
+  const text = ctx.message.reply_to_message?.text  
+  const id = text.match(/id:(\d+)/)?.[1]
+
+  if (!id) return ctx.reply("Please provide a id to send massage");
+
+  const chat = ctx?.match
+    ctx?.message?.text?.replace(/^\/(?:tousr)\s*/, "").trim()
+  if (!chat) return ctx.reply("Please send /tousr <MSG> or replay to a massage");
+  try {
+    await bot.api.sendMessage(
+      id,
+      `💌 Message from ADMIN\n\n ${chat}`
+    );
+    ctx.reply("Message sent to user");
+  } catch (error) {
+    if (error.response && error.response.error_code === 403) {
+      ctx.reply(`User not found`);
+    } else {
+      ctx.reply(`Error sending message to user`);
+    }
   }
 }

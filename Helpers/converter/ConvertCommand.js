@@ -10,6 +10,7 @@ export const convertCommand = async (ctx) => {
   });
 
   if (!asciiText) return ctx.reply("Please enter a valid text");
+  if (asciiText.length > 4000) return ctx.reply("Text too long");
 
   const keyboard = new InlineKeyboard()
     .copyText("Copy Text 📋", asciiText)

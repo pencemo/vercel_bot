@@ -56,9 +56,12 @@ export const userMiddleWare = async (ctx, next) => {
         lastName: last_name || '',
       });
       return next();
+    }else if(user && user.isBlocked) {
+      user.isBlocked = false;
+      await user.save();
     }
   
-    if (user.isBlocked && !user.isAdmin) {
+    if (user.isBan && !user.isAdmin) {
       return ctx.reply("🚫 You are blocked by admin.");
     }
   }else {

@@ -3,6 +3,7 @@ How can I assist you today?
 
 \\/start \\- Start the bot
 \\/help \\- Get help
+\\/settings \\- Change mode
 \\/about \\- About me
 \\/id \\- Get your Telegram ID
 \\/ping \\- Check if the bot is online
@@ -19,19 +20,26 @@ DataBase : *[MongoDB](https:\\/\\/www\\.mongodb\\.com)*
 Build Status : *v2\\.1\\.0 [stable]*`
 
 export const ADMIN_TEXT = `
-Admin commands
-\\/ban \\- Ban a user
-\\/unban \\- Unban a user
-\\/batch \\- Create batch link
+*Admin commands* 🕵️‍♂️
+
+*Functions*
+\\/add \\- Add a filters
+\\/del \\- Delete a filters
+\\/rmv \\- Remove a filters
+\\/filters \\- All filters
 \\/link \\- Create link
+\\/batch \\- Create batch link
 \\/done \\- Batch done
 \\/addtobatch \\- Add file to batch 
-\\/filters \\- All filters
-\\/del \\- Delete a filters
-\\/add \\- Add a filters
-\\/rmv \\- Remove a filters
-\\/broadcast \\- Replay to msg
 
+*User Management*
+\\/ban \\- Ban a user
+\\/unban \\- Unban a user
+\\/touser \\- Msg to user
+\\/broadcast \\- Replay to msg
+\\/userlist \\- All users list
+
+*Other*
 \\/dellink \\- Delete a link
 \\/delbatch \\- Delete a batch
 \\/delallbatch \\- Delete all batchs
@@ -39,13 +47,15 @@ Admin commands
 \\/delfiter \\- Delete all filters 
 `
 export const ADMIN_ONLY_TEXT = `Your not my admin 😏`
+export const SETTINGS_TEXT = `⚙️ Settings\n\nChoose your mode:\n\n*Filter :* Get filter in pm\n*Converter :* Unicode to ASSCI`
 
 
 export const helpMarkup = (isAdmin = false)=>{
     return {
         inline_keyboard: [
+            (isAdmin ? [{ text: 'Admin ⚙️', callback_data: 'admin' }]: []),
             [
-                ...(isAdmin ? [{ text: 'Admin ⚙️', callback_data: 'admin' }]: []),
+                { text: 'Settings ⚙️', callback_data: 'settings' },
                 { text: 'About 📝', callback_data: 'about' }
             ],
             [

@@ -1,10 +1,11 @@
+import { aboutMarkup } from "../Helpers/Utils.js";
 import User from "../db/User.js";
 import { Menu, MenuRange } from "@grammyjs/menu";
 
 const settingsMenu = new Menu("settings-menu").dynamic(async (ctx) => {
   const user = await User.findOne({ chatId: ctx.from.id });
   const range = new MenuRange();
-
+  const callback_data = ctx?.callbackQuery?.data;
   if (!user) {
     range.text("You are not registered");
     return range;
@@ -70,8 +71,12 @@ const settingsMenu = new Menu("settings-menu").dynamic(async (ctx) => {
           }
         }
       }
-    );
-
+    )
+    // .text("Hai", async (ctx) => {
+    //   const users = await User.countDocuments()
+    //   await ctx.editMessageText("I'm too shy. \n\nTotal users:"+users,)
+    // })
+   
   return range;
 });
 

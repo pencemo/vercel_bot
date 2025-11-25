@@ -10,10 +10,11 @@ import { batchCommand, deleteBatch, deleteLink, doneCommand, fileSave, getLink, 
 import { BOT_TOKEN } from "./config.js";
 import { userMiddleWare } from "./utils/middleware.js";
 import { callBackMsg, refresh } from "./utils/callbacks.js";
-import { helpCommand, aboutCommand, banUser, unbanUser, toAdmin, delBatchAll, delFileAll, delFiltersAll, banUsersList, getId } from "./utils/commands.js";
+import { helpCommand, aboutCommand, banUser, unbanUser, toAdmin, delBatchAll, delFileAll, delFiltersAll, banUsersList, getId, toUsr } from "./utils/commands.js";
 import { qrCallback, qrcode } from "./utils/Qrcode.js";
 import { broadcast, broadcastCallback } from "./utils/broadcast.js";
 import { settingsCommand, settingsMenu } from "./utils/Settings.js";
+import { allUsers, registerUserPagination } from "./utils/userList.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -72,11 +73,13 @@ bot.chatType("private").command("done", doneCommand);
 bot.chatType("private").command("ban", banUser);
 bot.chatType("private").command("unban", unbanUser);
 bot.chatType("private").command("banlist", banUsersList);
+bot.chatType("private").command("userlist", allUsers);
 bot.command("filters", allFilters);
 
 bot.chatType("private").command("about", aboutCommand);
 bot.chatType("private").command("help", helpCommand);
 bot.chatType("private").command("toadmin", toAdmin);
+bot.chatType("private").command("touser", toUsr);
 bot.chatType("private").command("broadcast", broadcast);
 bot.chatType("private").command("qrcode", qrcode)
 bot.chatType("private").command("settings", settingsCommand)
@@ -84,9 +87,10 @@ bot.command("id", getId);
 bot.command("ping", (ctx) => ctx.reply("pong"));
 
 bot.on(["message:text", "edited_message:text"], findFilter);
-bot.on(["message:document", "message:video"], fileSave); //.chatType(["supergroup", "group"])
+bot.on(["message:document", "message:video"], fileSave); 
 
 bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerFilterPagination); 
+bot.callbackQuery(/^filters_(next|prev)_(\d+)$/, registerUserPagination); 
 bot.callbackQuery(/^qr:(png|jpg|svg)$/, qrCallback); 
 bot.callbackQuery(["bc:confirm", "bc:cancel"], broadcastCallback); 
 bot.callbackQuery(/^refresh_(.+)$/, refresh);
@@ -121,5 +125,4 @@ bot.catch(async (err) => {
 start();
 connection()
 
-// export default webhookCallback(bot, "vercel");
 
