@@ -5,6 +5,7 @@ import Batch from "../db/Batch.js";
 import File from "../db/File.js";
 import { api } from "../index.js";
 import { escapeMarkdownSpecialChars } from "../Helpers/helpers.js";
+import { sendLogo } from "./logotypes.js";
 
 export const startMsg = async (ctx) => {
   if(!isPrivateChat(ctx)){
@@ -101,6 +102,11 @@ export const startMsg = async (ctx) => {
         }
       }
       return ctx.reply("✅ All files sent successfully!");
+    }
+    // ✅ Handle batch links
+    if (param.startsWith("logo_")) {
+      sendLogo(ctx)
+      return
     }
 
     // ✅ Handle single file links

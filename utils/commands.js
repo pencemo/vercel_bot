@@ -5,6 +5,7 @@ import {
   aboutMarkup,
   helpMarkup,
 } from "../Helpers/Utils.js";
+import { escapeMarkdownV2 } from "../Helpers/helpers.js";
 import { isAdmin, isPrivateChat } from "../Helpers/isAdmin.js";
 import { ADMIN_ID } from "../config.js";
 import User from "../db/User.js";
@@ -109,7 +110,9 @@ export const toAdmin = async (ctx) => {
   try {
     await bot.api.sendMessage(
       ADMIN_ID,
-      `Id : ${ctx?.from?.id}\n\n 💌 Message from @${ctx?.from?.username}\n\n ${chat}`
+      `Id : \`${ctx?.from?.id}\`\n\n 💌 Message from @${ctx?.from?.username}\n\n ${escapeMarkdownV2(chat)}`, {
+        parse_mode: "MarkdownV2",
+      }
     );
     ctx.reply("Message sent to admin");
   } catch (error) {
@@ -182,18 +185,15 @@ export const toUsr = async (ctx) => {
   if (!isAdmin(ctx.from.id)) {
     return ctx.reply(ADMIN_ONLY_TEXT);
   }
-  const text = ctx.message.reply_to_message?.text  
-  const id = text.match(/id:(\d+)/)?.[1]
+  const id = ctx?.match
+  if (!id) return ctx.reply("Please provide a id to send massage /tousr <userId>");
 
-  if (!id) return ctx.reply("Please provide a id to send massage");
+  const chat = ctx?.message?.reply_to_message
+  if (!chat) return ctx.reply("Please replay to a massage");
 
-  const chat = ctx?.match
-    ctx?.message?.text?.replace(/^\/(?:tousr)\s*/, "").trim()
-  if (!chat) return ctx.reply("Please send /tousr <MSG> or replay to a massage");
   try {
-    await bot.api.sendMessage(
-      id,
-      `💌 Message from ADMIN\n\n ${chat}`
+    await bot.api.copyMessage(
+      id, ctx.chat.id, chat.message_id 
     );
     ctx.reply("Message sent to user");
   } catch (error) {

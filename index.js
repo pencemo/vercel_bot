@@ -15,6 +15,7 @@ import { qrCallback, qrcode } from "./utils/Qrcode.js";
 import { broadcast, broadcastCallback } from "./utils/broadcast.js";
 import { settingsCommand, settingsMenu } from "./utils/Settings.js";
 import { allUsers, registerUserPagination } from "./utils/userList.js";
+import { logoMenu, sendLogo } from "./utils/logotypes.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -56,6 +57,7 @@ const start = async () => {
 
 bot.use(userMiddleWare);
 bot.use(settingsMenu);
+bot.use(logoMenu);
 
 bot.command("start", startMsg);
 bot.chatType("private").command("add", addFilters);
@@ -82,6 +84,7 @@ bot.chatType("private").command("toadmin", toAdmin);
 bot.chatType("private").command("touser", toUsr);
 bot.chatType("private").command("broadcast", broadcast);
 bot.chatType("private").command("qrcode", qrcode)
+bot.chatType("private").command("logo", sendLogo)
 bot.chatType("private").command("settings", settingsCommand)
 bot.command("id", getId);
 bot.command("ping", (ctx) => ctx.reply("pong"));

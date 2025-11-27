@@ -4,6 +4,7 @@ import { escapeRegex, extractData } from "../Helpers/helpers.js";
 import { InlineKeyboard } from "grammy";
 import User from "../db/User.js";
 import { convertCommand } from "../Helpers/converter/ConvertCommand.js";
+import { sendLogo, sendLogoInChat } from "./logotypes.js";
 
 const addFilters = async (ctx) => {
   if (!isAdmin(ctx.from.id)) {
@@ -132,6 +133,7 @@ const findFilter = async (ctx) => {
     }
 
     if (!matchedFilter) {
+      sendLogoInChat(ctx)
       return;
     }
 
