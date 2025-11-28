@@ -3,6 +3,7 @@ import { InputFile } from "grammy";
 import { Menu, MenuRange } from "@grammyjs/menu";
 import axios from "axios";
 import sharp from "sharp";
+import { forceSub } from "./middleware.js";
 
 const userLogo = new Map();
 
@@ -179,9 +180,22 @@ async function fetchAvailableOptions(brand) {
   });
   
   
-
+ 
   export const sendLogo = async (ctx) => {
-    const brand = ctx.match?.trim()?.toLowerCase().replace(/ /g, "_").replace("logo_", "") || ctx.message.text?.trim()?.toLowerCase().replace(/ /g, "_").replace("logo_", "");
+    if(!await forceSub(ctx)) return;
+    // const brand = ctx.match?.trim()?.toLowerCase().replace(/ /g, "_").replace("logo_", "").replace("refresh_", "")// || ctx.message.text?.trim()?.toLowerCase().replace(/ /g, "_").replace("logo_", "");
+    const raw = Array.isArray(ctx.match)
+  ? ctx.match[0]           // take first matched string
+  : ctx.match || "";
+
+const brand = raw
+  .toString()
+  .trim()
+  .toLowerCase()
+  .replace(/ /g, "_")
+  .replace("logo_", "")
+  .replace("refresh_", "");
+  
     if (!brand) return ctx.reply("Usage: /logo google");
     const logos = userLogo.get(ctx.from.id);
     if(logos && logos?.brand === brand){
@@ -225,7 +239,7 @@ async function fetchAvailableOptions(brand) {
     await ctx.api.editMessageText(
       msg.chat.id,
       msg.message_id,
-      `🎨 Select logo options for *${brand}*`,
+      `🎨 Select logo options for *${brand}*\n\n\`Choose your mode\`\n\*Variant : Glyph | Wordmark\nVersion : Color | Black | White\*`,
       {
         parse_mode: "Markdown",
         reply_markup: logoMenu,
@@ -252,9 +266,9 @@ async function fetchAvailableOptions(brand) {
       available,
     });
   
-    // Step 6: show menu
+    // Step 6: show menu 
     await ctx.reply(
-      `🎨 Select logo options for *${brand}*\n\nUse button to get file\n©️ @pencemodesigns`,
+      `🎨 Click button to get *${brand}* logo file\n\n©️ @pencemodesigns`,
       {
         parse_mode: "Markdown",
         reply_markup: {

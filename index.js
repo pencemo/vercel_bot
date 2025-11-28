@@ -16,6 +16,7 @@ import { broadcast, broadcastCallback } from "./utils/broadcast.js";
 import { settingsCommand, settingsMenu } from "./utils/Settings.js";
 import { allUsers, registerUserPagination } from "./utils/userList.js";
 import { logoMenu, sendLogo } from "./utils/logotypes.js";
+import { channelPost } from "./utils/channelPost.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -86,6 +87,7 @@ bot.chatType("private").command("broadcast", broadcast);
 bot.chatType("private").command("qrcode", qrcode)
 bot.chatType("private").command("logo", sendLogo)
 bot.chatType("private").command("settings", settingsCommand)
+bot.chatType("private").command("channel", channelPost)
 bot.command("id", getId);
 bot.command("ping", (ctx) => ctx.reply("pong"));
 

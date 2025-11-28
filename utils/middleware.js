@@ -4,10 +4,10 @@ import { CHANNEL_USERNAME, GROUP_ID, SUB_CHANNEL_ID } from "../config.js";
 import { api } from "../index.js";
 import User from "../db/User.js";
 
-export const forceSub = async (ctx, next) => {
+export const forceSub = async (ctx) => {
     const chatId = ctx.from?.id;
     if (!chatId) return;
-    if (isAdmin(chatId)) return await next();
+    if (isAdmin(chatId)) return true
   
     try {
       const member = await api.getChatMember(SUB_CHANNEL_ID, chatId);
@@ -20,7 +20,7 @@ export const forceSub = async (ctx, next) => {
           `📢 Please join our channel to use this bot!\n👉 @${CHANNEL_USERNAME}`,
           { reply_markup: keyboard }
         );
-        return;
+        return false
       }
     } catch (error) {
       console.error("Error checking subscription:", error);
@@ -32,10 +32,9 @@ export const forceSub = async (ctx, next) => {
         `⚠️ Unable to verify your subscription.\nPlease make sure you've joined @${CHANNEL_USERNAME}.`,
         { reply_markup: keyboard }
       );
-      return;
+      return false
     }
-  
-    await next();
+  return true
   };
 
 

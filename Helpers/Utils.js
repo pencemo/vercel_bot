@@ -9,6 +9,7 @@ How can I assist you today?
 \\/ping \\- Check if the bot is online
 \\/toadmin \\- Send message to admin
 \\/qrcode \\- Generate a QR code
+\\/logo \\- Get brand logo
 `
 
 export const ABOUT_TEXT = `📄 *About me*
@@ -31,6 +32,7 @@ export const ADMIN_TEXT = `
 \\/batch \\- Create batch link
 \\/done \\- Batch done
 \\/addtobatch \\- Add file to batch 
+\\/channel \\- Post to sub channel 
 
 *User Management*
 \\/ban \\- Ban a user
@@ -46,6 +48,16 @@ export const ADMIN_TEXT = `
 \\/delallfile \\- Delete all files
 \\/delfiter \\- Delete all filters 
 `
+
+export const LOGO_TEXT = `You can now get brand logo files directly through the bot — instantly and in multiple styles\\! \n\nSupported formats & styles:
+\`\`\`
+✔️ SVG & PNG
+✔️ Color, Black, White
+✔️ Glyph & Wordmark versions \`\`\`
+
+Just use the command:
+/logo \\<brand name\\>
+`
 export const ADMIN_ONLY_TEXT = `Your not my admin 😏`
 export const SETTINGS_TEXT = `⚙️ Settings\n\nChoose your mode:\n\n*Filter :* Get filter in pm\n*Converter :* Unicode to ASSCI`
 
@@ -56,9 +68,10 @@ export const helpMarkup = (isAdmin = false)=>{
             (isAdmin ? [{ text: 'Admin 🥷', callback_data: 'admin' }]: []),
             [
                 { text: 'Settings ⚙️', callback_data: 'settings' },
-                { text: 'About 📝', callback_data: 'about' }
+                { text: 'Logo 📝', callback_data: 'logo' }
             ],
             [
+                { text: 'About 🔥', callback_data: 'about' },
                 { text: 'Support Group 👩‍💻', url: 'https://t.me/pencemodesign' }
             ],
         ]

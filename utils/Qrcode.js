@@ -1,5 +1,6 @@
 import { InlineKeyboard, InputFile } from "grammy";
 import QRCode from "qrcode";
+import { forceSub } from "./middleware.js";
 const userQrText = new Map(); // Map<userId, text>
 // cooldown store
 const userLastQr = new Map(); // Map<userId, timestamp>
@@ -9,9 +10,10 @@ const COOLDOWN_MS = 5 * 60_000; // 5 min limit per QR
 // /qrcode [text]
 // OR reply to a message with /qrcode
 export const qrcode =  async (ctx) => {
+  if(!await forceSub(ctx)) return;
     const userId = ctx.from.id;
     const now = Date.now();
-    const last = userLastQr.get(userId) ?? 0;
+    const last = userLastQr.get(userId) ?? 0; 
     const diff = now - last;
   
     if (diff < COOLDOWN_MS) {

@@ -2,12 +2,13 @@ import { api } from "../index.js";
 import Batch from "../db/Batch.js";
 import File from "../db/File.js";
 import { SUB_CHANNEL_ID } from "../config.js";
-import { ABOUT_TEXT, ADMIN_TEXT, HELP_TEXT, SETTINGS_TEXT, aboutMarkup, adminMarkup, helpMarkup } from "../Helpers/Utils.js";
+import { ABOUT_TEXT, ADMIN_TEXT, HELP_TEXT, LOGO_TEXT, SETTINGS_TEXT, aboutMarkup, adminMarkup, helpMarkup } from "../Helpers/Utils.js";
 import { escapeMarkdownSpecialChars } from "../Helpers/helpers.js";
 import { isAdmin } from "../Helpers/isAdmin.js";
 import User from "../db/User.js";
 import { Filter } from "../db/models.js";
 import { settingsMenu } from "./Settings.js";
+import { sendLogo } from "./logotypes.js";
 
 export const refresh = async (ctx) => {
     const param = ctx.match[1];
@@ -48,6 +49,10 @@ export const refresh = async (ctx) => {
         }
         await ctx.editMessageText("✅ All files sent successfully!");
         return;
+      }
+      if (param.startsWith("logo_")) {
+        sendLogo(ctx)
+        return
       }
   
       const file = await File.findOne({ slug: param });
@@ -95,6 +100,13 @@ export const callBackMsg =  async (ctx) => {
         parse_mode: "MarkdownV2",
         disable_web_page_preview: true,
         reply_markup: settingsMenu,
+      }) 
+    }
+    if(data == "logo"){
+      return ctx.editMessageText(LOGO_TEXT, {
+        parse_mode: "MarkdownV2",
+        disable_web_page_preview: true,
+        reply_markup: {inline_keyboard : [[{text: "Back 🔙", callback_data: "help"}]]},
       }) 
     }
     if(data == "admin"){
