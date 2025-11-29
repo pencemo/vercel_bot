@@ -1,4 +1,4 @@
-import { Api, Bot } from "grammy";
+import { Api, Bot, session } from "grammy";
 import express from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
@@ -17,6 +17,7 @@ import { settingsCommand, settingsMenu } from "./utils/Settings.js";
 import { allUsers, registerUserPagination } from "./utils/userList.js";
 import { logoMenu, sendLogo } from "./utils/logotypes.js";
 import { channelPost } from "./utils/channelPost.js";
+import { chooseFormat, findIcons, iconCallback } from "./utils/icons.js";
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -86,6 +87,7 @@ bot.chatType("private").command("touser", toUsr);
 bot.chatType("private").command("broadcast", broadcast);
 bot.chatType("private").command("qrcode", qrcode)
 bot.chatType("private").command("logo", sendLogo)
+bot.chatType("private").command("icon", findIcons)
 bot.chatType("private").command("settings", settingsCommand)
 bot.chatType("private").command("channel", channelPost)
 bot.command("id", getId);
@@ -99,6 +101,9 @@ bot.callbackQuery(/users_page_/, registerUserPagination);
 bot.callbackQuery(/^qr:(png|jpg|svg)$/, qrCallback); 
 bot.callbackQuery(["bc:confirm", "bc:cancel"], broadcastCallback); 
 bot.callbackQuery(/^refresh_(.+)$/, refresh);
+bot.callbackQuery(/^choose:(.+)$/, chooseFormat);
+
+bot.callbackQuery(/^get:(svg|png):(.+)$/, iconCallback);
 bot.on("callback_query:data", callBackMsg)
 
 bot.catch(async (err) => {

@@ -8,13 +8,39 @@ import { forceSub } from "./middleware.js";
 const userLogo = new Map();
 
 async function fetchAvailableOptions(brand) {
-    try {
-      const res = await axios.get(`${LOGO_ENDPOINT}/${brand}/data`);
-      if (!Array.isArray(res.data)) return [];
+  try {
+    const res = await axios.get(`${LOGO_ENDPOINT}/${brand}/data`);
+    // console.log("simple.data");
+      if (!res || !Array.isArray(res.data)){
+        const url = `https://cdn.simpleicons.org/${brand}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          if (response.status === 404) {
+            return []
+          }
+          throw new Error("Network response was not ok");
+        }
+        return [{
+          variant: 'glyph',
+          version: "color",
+          logo: url,
+        }]
+      }
       return res.data;
     } catch (err) {
-      // console.error("Fetch data error:", err);
-      return [];
+      const url = `https://cdn.simpleicons.org/${brand}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          if (response.status === 404) {
+            return []
+          }
+          throw new Error("Network response was not ok");
+        }
+        return [{
+          variant: 'glyph',
+          version: "color",
+          logo: url,
+        }]
     }
   }
   
@@ -249,10 +275,11 @@ const brand = raw
   
 
   export const sendLogoInChat = async (ctx) => {
-    const brand = ctx.message.text?.toLowerCase()
-    .replace(/logo/gi, "")
+    const row = ctx?.message?.text || ""
+    const brand = row.toString().replace(/logo/gi, "")
     .replace(/png/gi, "")
     ?.trim()
+    ?.toLowerCase()
     .replace(/ /g, "_")
     const available = await fetchAvailableOptions(brand);
   

@@ -8,8 +8,10 @@ How can I assist you today?
 \\/id \\- Get your Telegram ID
 \\/ping \\- Check if the bot is online
 \\/toadmin \\- Send message to admin
+
 \\/qrcode \\- Generate a QR code
 \\/logo \\- Get brand logo
+\\/icon \\- Get icons
 `
 
 export const ABOUT_TEXT = `📄 *About me*
@@ -58,6 +60,38 @@ export const LOGO_TEXT = `You can now get brand logo files directly through the 
 Just use the command:
 /logo \\<brand name\\>
 `
+
+export const QR_TEXT = `Generate your on QR Code with bot\\! 
+
+*How to use:*
+\`• Reply to a message wiht /qrcode
+• Or: /qrcode Your text here \`
+
+Then choose the format \\(PNG/SVG\\)\\.
+`
+
+export const ICON_TEXT = `Now can get icon files directly through the bot\\! 
+
+*How to use:*
+\_• Reply to a message wiht /icon
+• Or: /icon icon\\-name 
+• choose the format \\(PNG/SVG\\)\\. \_ 
+
+💡Here are some icon name examples:
+ \`\\/icon home\`
+ \`\\/icon home\\-outline\`
+ \`\\/icon home\\-outline-rounded\`
+ \`\\/icon home\\-outline-sharp\`
+ \`\\/icon home\\-rounded\`
+ \`\\/icon home\\-sharp\`
+ \`\\/icon home\\-bold\`
+ \`\\/icon home\\-duotone\`
+ \`\\/icon home\\-broken\`
+ \`\\/icon home\\-line-duotone\`
+ \`\\/icon home\\-fill\`
+ \`\\/icon home\\-line\`
+ \`\\/icon home\\-solid\`
+`
 export const ADMIN_ONLY_TEXT = `Your not my admin 😏`
 export const SETTINGS_TEXT = `⚙️ Settings\n\nChoose your mode:\n\n*Filter :* Get filter in pm\n*Converter :* Unicode to ASSCI`
 
@@ -68,7 +102,11 @@ export const helpMarkup = (isAdmin = false)=>{
             (isAdmin ? [{ text: 'Admin 🥷', callback_data: 'admin' }]: []),
             [
                 { text: 'Settings ⚙️', callback_data: 'settings' },
-                { text: 'Logo 📝', callback_data: 'logo' }
+                { text: 'QR Code 🔗', callback_data: 'qrcode' }
+            ],
+            [
+                { text: 'Logo 📝', callback_data: 'logo' },
+                { text: 'Icon ⚜️', callback_data: 'icon' },
             ],
             [
                 { text: 'About 🔥', callback_data: 'about' },

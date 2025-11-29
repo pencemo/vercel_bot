@@ -2,7 +2,7 @@ import { api } from "../index.js";
 import Batch from "../db/Batch.js";
 import File from "../db/File.js";
 import { SUB_CHANNEL_ID } from "../config.js";
-import { ABOUT_TEXT, ADMIN_TEXT, HELP_TEXT, LOGO_TEXT, SETTINGS_TEXT, aboutMarkup, adminMarkup, helpMarkup } from "../Helpers/Utils.js";
+import { ABOUT_TEXT, ADMIN_TEXT, HELP_TEXT, ICON_TEXT, LOGO_TEXT, QR_TEXT, SETTINGS_TEXT, aboutMarkup, adminMarkup, helpMarkup } from "../Helpers/Utils.js";
 import { escapeMarkdownSpecialChars } from "../Helpers/helpers.js";
 import { isAdmin } from "../Helpers/isAdmin.js";
 import User from "../db/User.js";
@@ -104,6 +104,20 @@ export const callBackMsg =  async (ctx) => {
     }
     if(data == "logo"){
       return ctx.editMessageText(LOGO_TEXT, {
+        parse_mode: "MarkdownV2",
+        disable_web_page_preview: true,
+        reply_markup: {inline_keyboard : [[{text: "Back 🔙", callback_data: "help"}]]},
+      }) 
+    }
+    if(data == "qrcode"){
+      return ctx.editMessageText(QR_TEXT, {
+        parse_mode: "MarkdownV2",
+        disable_web_page_preview: true,
+        reply_markup: {inline_keyboard : [[{text: "Back 🔙", callback_data: "help"}]]},
+      }) 
+    }
+    if(data == "icon"){
+      return ctx.editMessageText(ICON_TEXT, {
         parse_mode: "MarkdownV2",
         disable_web_page_preview: true,
         reply_markup: {inline_keyboard : [[{text: "Back 🔙", callback_data: "help"}]]},
