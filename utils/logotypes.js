@@ -13,8 +13,8 @@ async function fetchAvailableOptions(brand) {
     // console.log("simple.data");
       if (!res || !Array.isArray(res.data)){
         const url = `https://cdn.simpleicons.org/${brand}`;
-        const response = await fetch(url);
-        if (!response.ok) return []
+        const response = await axios.get(url);
+        if (!response || !response.data) return []
         return [{
           variant: 'glyph',
           version: "color",
@@ -24,8 +24,8 @@ async function fetchAvailableOptions(brand) {
       return res.data;
     } catch (err) {
       const url = `https://cdn.simpleicons.org/${brand}`;
-        const response = await fetch(url);
-        if (!response.ok) return []
+        const response = await axios.get(url);
+        if (!response || !response.data) return []
         return [{
           variant: 'glyph',
           version: "color",
