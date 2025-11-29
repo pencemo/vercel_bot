@@ -14,12 +14,7 @@ async function fetchAvailableOptions(brand) {
       if (!res || !Array.isArray(res.data)){
         const url = `https://cdn.simpleicons.org/${brand}`;
         const response = await fetch(url);
-        if (!response.ok) {
-          if (response.status === 404) {
-            return []
-          }
-          throw new Error("Network response was not ok");
-        }
+        if (!response.ok) return []
         return [{
           variant: 'glyph',
           version: "color",
@@ -30,12 +25,7 @@ async function fetchAvailableOptions(brand) {
     } catch (err) {
       const url = `https://cdn.simpleicons.org/${brand}`;
         const response = await fetch(url);
-        if (!response.ok) {
-          if (response.status === 404) {
-            return []
-          }
-          throw new Error("Network response was not ok");
-        }
+        if (!response.ok) return []
         return [{
           variant: 'glyph',
           version: "color",

@@ -104,7 +104,8 @@ export const iconCallback = async (ctx) => {
 
 export const chooseFormat = async (ctx) => {
   const iconName = ctx.match[1];
-
+  await ctx.answerCallbackQuery();
+  
   const kb = new InlineKeyboard()
     .text("📄 SVG", `get:svg:${iconName}`)
     .text("🖼 PNG", `get:png:${iconName}`);
