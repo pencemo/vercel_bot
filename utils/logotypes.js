@@ -10,16 +10,10 @@ const userLogo = new Map();
 async function fetchAvailableOptions(brand) {
   try {
     const res = await axios.get(`${LOGO_ENDPOINT}/${brand}/data`);
-    // console.log("simple.data");
       if (!res || !Array.isArray(res.data)){
         const url = `https://cdn.simpleicons.org/${brand}`;
-        const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'image/svg+xml,application/xml,text/xml,*/*;0.8'
-      }
-    });
-        if (!response || !response.data || response.status != 200) return []
+        const response = await fetch(url);
+        if (!response.ok)  return []
         return [{
           variant: 'glyph',
           version: "color",
@@ -29,13 +23,8 @@ async function fetchAvailableOptions(brand) {
       return res.data;
     } catch (err) {
       const url = `https://cdn.simpleicons.org/${brand}`;
-        const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'image/svg+xml,application/xml,text/xml,*/*;0.8'
-      }
-    });
-        if (!response || !response.data || response.status != 200) return []
+        const response = await fetch(url);
+        if (!response.ok)  return []
         return [{
           variant: 'glyph',
           version: "color",
